@@ -30,3 +30,29 @@ export async function insertUser(data) {
     }
     return response
 }
+
+export async function updateUser(data) {
+    const { id_user, email, passwd, isAdmin } = data;
+    const updated_at = new Date().toISOString();
+    let response
+    try {
+        response = isAdmin ? await pg("users").returning(['id_user', 'email']).where({ id_user }).update({ email, passwd, isAdmin, updated_at }) : await pg("users").returning(['id_user', 'email']).where({ id_user }).update({ email, passwd, updated_at })
+    } catch (error) {
+        console.log(error)
+        response = { error: 'unable to update user' }
+    }
+    return response
+}
+
+export async function deleteUser(data) {
+    const { id_user } = data;
+    let response
+    try {
+        response = await pg("users").where({ id_user }).del()
+    }
+    catch (error) {
+        console.log(error)
+        response = { error: 'unable to delete user' }
+    }
+    return response
+}

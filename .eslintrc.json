@@ -15,6 +15,8 @@
         "no-control-regex": "warn",
         "no-debugger": "warn",
         "no-empty": "error",
-        "no-empty-function": "error"
+        "no-empty-function": "error",
+        "no-unused-vars": "warn",
+        "no-const-assign": "error"
     }
 }

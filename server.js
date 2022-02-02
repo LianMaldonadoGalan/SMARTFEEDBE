@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { searchUsers, insertUserController } from './app/controllers/controller.users';
+import { searchUsers, insertUserController, updateUserController } from './app/controllers/controller.users';
 
 // Constants
 const PORT = 8080;
@@ -19,6 +19,8 @@ app.use('/', (req, res, next) => {
 app.get('/users', searchUsers);
 
 app.post('/users', insertUserController);
+
+app.patch('/users', updateUserController);
 
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
