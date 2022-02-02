@@ -1,5 +1,4 @@
-import res from 'express/lib/response';
-
+/* eslint-disable no-undef */
 require('dotenv').config();
 
 const pg = require('knex')({
