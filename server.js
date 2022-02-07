@@ -1,10 +1,6 @@
 import express from 'express';
 
-import { searchUsers, insertUserController, updateUserController } from './app/controllers/controller.users';
-
-// Constants
-const PORT = 8080;
-const HOST = '0.0.0.0';
+import { searchUsers, insertUserController, updateUserController, deleteUserController } from './app/controllers/controller.users';
 
 // App
 const app = express();
@@ -22,5 +18,6 @@ app.post('/users', insertUserController);
 
 app.patch('/users', updateUserController);
 
-app.listen(PORT, HOST);
-console.log(`Running on http://${HOST}:${PORT}`);
+app.delete('/users', deleteUserController);
+
+export default app;

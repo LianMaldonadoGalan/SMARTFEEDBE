@@ -1,4 +1,4 @@
-import { getUser, insertUser, updateUser } from '../services/service.users';
+import { getUser, insertUser, updateUser, deleteUser } from '../services/service.users';
 
 export async function searchUsers(req, res) {
     const { email, passwd } = req.body;
@@ -40,4 +40,18 @@ export async function updateUserController(req, res) {
         res.status(500).json({ error: userUpdated.error });
 
     return res.status(200).json(userUpdated);
+}
+
+export async function deleteUserController(req, res) {
+    const { id_user } = req.body;
+    if(!id_user) {
+        res.status(400).json({ error: 'id_user is required' });
+    }
+
+    const userDeleted = await deleteUser({ id_user });
+
+    if(userDeleted.error)
+        res.status(500).json({ error: userDeleted.error });
+
+    return res.status(200).json(userDeleted);
 }

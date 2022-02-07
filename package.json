@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node -r esm server.js",
-    "dev": "nodemon -r esm server.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose",
+    "start": "node -r esm start.js",
+    "dev": "nodemon -r esm start.js",
+    "prepare": "husky install",
+    "lint:js:fix": "npm run eslint . --ext .js,.jsx --fix"
   },
   "author": "",
   "license": "ISC",
@@ -17,8 +20,27 @@
     "pg": "^8.7.1"
   },
   "devDependencies": {
+    "@types/jest": "^27.4.0",
     "dotenv": "^15.0.0",
     "eslint": "^8.8.0",
-    "nodemon": "^2.0.15"
+    "husky": "^7.0.0",
+    "jest": "^27.5.0",
+    "lint-staged": "^12.3.3",
+    "nodemon": "^2.0.15",
+    "supertest": "^6.2.2"
+  },
+  "jest": {
+    "testEnvironment": "jest-environment-node",
+    "transform": {}
+  },
+  "lint-staged": {
+    "app/**/*.{js,jsx}": [
+      "eslint . --fix", "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }
