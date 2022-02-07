@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
-  "type": "module",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose",
     "start": "node -r esm start.js",
@@ -17,7 +16,8 @@
     "esm": "^3.2.25",
     "express": "^4.17.2",
     "knex": "^1.0.1",
-    "pg": "^8.7.1"
+    "pg": "^8.7.1",
+    "pino": "^7.6.5"
   },
   "devDependencies": {
     "@types/jest": "^27.4.0",
@@ -35,7 +35,8 @@
   },
   "lint-staged": {
     "app/**/*.{js,jsx}": [
-      "eslint . --fix", "git add"
+      "eslint . --fix",
+      "git add"
     ]
   },
   "husky": {
