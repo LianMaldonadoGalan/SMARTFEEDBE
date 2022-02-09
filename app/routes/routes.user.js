@@ -1,9 +1,5 @@
-import express from 'express';
+import app from '../../server';
 
-// App
-const app = express();
+import { searchUsers } from './app/controllers/controller.users';
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
-
+app.get('/users', searchUsers);

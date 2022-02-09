@@ -53,8 +53,3 @@ export async function deleteUser(data) {
     }
     return response
 }
-
-export async function terminateConnection() {
-    logger.info('closing connection')
-    await pg.destroy();
-}

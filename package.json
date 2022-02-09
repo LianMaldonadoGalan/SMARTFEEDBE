@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose",
+    "test:watch": "npm test -- --watch",
     "start": "node -r esm start.js",
     "dev": "nodemon -r esm start.js",
     "prepare": "husky install",
