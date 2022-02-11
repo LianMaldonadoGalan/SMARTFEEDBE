@@ -55,12 +55,12 @@ export async function updateIngredientController(req, res) {
     const { ingredient_id } = req.params;
     const { name:ingredient_name, picture:ingredient_picture } = req.body;
     
-    if (!ingredient_id || !ingredient_name || !ingredient_picture) {
-        logger.error('id_ingredient, name or picture is not defined');
-        return res.status(400).json({ error: 'id_ingredient, name or picture are required' });
+    if (!ingredient_id ) {
+        logger.error('id_ingredient is not defined');
+        return res.status(400).json({ error: 'id_ingredient are required' });
     }
 
-    const ingredient = await updateIngredient({ ingredient_id, ingredient_name, ingredient_picture });
+    const ingredient = await updateIngredient({ ingredient_name, ingredient_picture }, { ingredient_id });
 
     if (ingredient.error) {
         logger.error(ingredient.error);
