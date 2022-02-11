@@ -30,6 +30,17 @@ describe('Ingredients Right', () => {
         idIngredient = res.body[0].ingredient_id;
     })
 
+    it('should get all ingredients', async () => {
+        const res = await request.get('/ingredients');
+
+        expect(res.status).toBe(200);
+        expect(res.body.length).toBeGreaterThan(0);
+        expect(res.body[0]).toHaveProperty('ingredient_id');
+        expect(res.body[0]).toHaveProperty('ingredient_name');
+        expect(res.body[0]).toHaveProperty('ingredient_picture');
+        expect(res.body[0]).toHaveProperty('created_at');
+    })
+
     it('should return ingredients', async () => {
         const res = await request.get(`/ingredients/${idIngredient}`);
         
