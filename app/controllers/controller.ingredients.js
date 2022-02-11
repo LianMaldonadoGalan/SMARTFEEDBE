@@ -1,8 +1,19 @@
-import { getIngredient, insertIngredient, updateIngredient, deleteIngredient } from '../services/service.ingredients';
+import { getIngredient, insertIngredient, updateIngredient, deleteIngredient, getAllIngredients } from '../services/service.ingredients';
 
 import Pino from 'pino'
 
 const logger = Pino()
+
+export async function getAllIngredientsController(req, res){
+    const allIngredients = await getAllIngredients()
+    
+    if(allIngredients.error){
+        logger.error(allIngredients.error)
+        return res.status(500).json({ error: allIngredients.error })
+    }
+
+    return res.status(200).json(allIngredients)
+}
 
 export async function getIngredientController(req, res) {
     const { ingredient_id } = req.params;

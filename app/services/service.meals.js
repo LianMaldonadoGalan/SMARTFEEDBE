@@ -5,15 +5,29 @@ const logger = Pino();
 
 const pg = knexfile;
 
+export async function getAllMeals() {
+    let response
+    try {
+        response = await pg.select().from('meals');
+    } catch (error) {
+        logger.error(error);
+        response = {
+            msg: 'unable to get all meals',
+            error: error
+        }
+    }
+    return response;
+}
+
 export async function getMeal(data){
     let response;
     try{
-        response = await pg.select('id_meal', 'meal_photo', 'meal_name', 'meal_description', 'meal_type', 'meal_cost', 'meal_protein', 'meal_calories', 'meal_carbohydrates', 'meal_fats', 'created_at')
+        response = await pg.select()
                             .from('meals')
                             .where(data);
     }catch(error){
         logger.error(error);
-        response = { error: 'unable to get meal' };
+        response = { msg: 'unable to get meal', error: error };
     }
     return response;
 }
@@ -26,21 +40,22 @@ export async function insertMeal(data) {
                             .into('meals');
     } catch (error) {
         logger.error(error);
-        response = { error: 'unable to insert meal' };
+        response = { msg: 'unable to insert meal', error: error };
     }
     return response;
 }
 
 export async function updateMeal(data) {
-    const { id_meal, meal_photo, meal_name, meal_description, meal_type, meal_cost, meal_protein, meal_calories, meal_carbohydrates, meal_fats } = data;
+    const { id_meal } = data;
+    delete data.id_meal
     let response
     try {
         response = await pg("meals").returning(['id_meal', 'meal_photo', 'meal_name', 'meal_description', 'meal_type', 'meal_cost', 'meal_protein', 'meal_calories', 'meal_carbohydrates', 'meal_fats', 'updated_at'])
                             .where({ id_meal })
-                            .update({ meal_photo, meal_name, meal_description, meal_type, meal_cost, meal_protein, meal_calories, meal_carbohydrates, meal_fats });
+                            .update(data);
     } catch(error){
         logger.error(error);
-        response = { error: 'unable to update meal' };
+        response = { msg: 'unable to update meal', error: error };
     }
     return response;
 }
@@ -53,7 +68,7 @@ export async function deleteMeal(data) {
                             .del();
     } catch(error){
         logger.error(error);
-        response = { error: 'unable to delete meal' };
+        response = { msg: 'unable to delete meal', error: error };
     }
     return response;
 }

@@ -1,8 +1,10 @@
 import express from "express";
 
-import { getIngredientController, insertIngredientController, updateIngredientController, deleteIngredientController } from "../controllers/controller.ingredients";
+import { getIngredientController, insertIngredientController, updateIngredientController, deleteIngredientController, getAllIngredientsController } from "../controllers/controller.ingredients";
 
 export const routerIngredients = express.Router();
+
+routerIngredients.get('/', getAllIngredientsController)
 
 routerIngredients.get('/:ingredient_id', getIngredientController)
 
