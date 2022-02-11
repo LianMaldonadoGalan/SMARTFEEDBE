@@ -35,7 +35,6 @@ export async function updateRecipe(data, queryParams) {
     let response
     try {
         response = await pg("recipes").returning(['recipe_id', 'id_meal', 'meal_ingredients', 'meal_recipe', 'meal_prep_time', 'updated_at']).where({ recipe_id }).update({...data, updated_at })
-        console.log(response)
     } catch (error) {
         logger.error(error);
         response = { msg: 'unable to update recipe', error };
