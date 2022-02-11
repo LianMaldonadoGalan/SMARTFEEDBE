@@ -25,7 +25,7 @@ afterAll(() => {
 
 let mealIdTest = 0;
 
-describe('Meals', () => {
+describe('Meals right', () => {
     it('Should create a new meal', async () => {
         const res = await request.post('/meals').send(mealTest);
         

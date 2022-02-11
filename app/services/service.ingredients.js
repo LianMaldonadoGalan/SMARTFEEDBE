@@ -39,12 +39,12 @@ export async function insertIngredient(data) {
     return response;
 }
 
-export async function updateIngredient(data) {
-    const { ingredient_id, ingredient_name, ingredient_picture } = data;
+export async function updateIngredient(data, queryParams) {
+    const { ingredient_id } = queryParams;
     const updated_at = new Date().toISOString();
     let response
     try {
-        response = await pg("ingredients").returning(['ingredient_id', 'ingredient_name', 'ingredient_picture', 'updated_at']).where({ ingredient_id }).update({ ingredient_name, ingredient_picture, updated_at })
+        response = await pg("ingredients").returning(['ingredient_id', 'ingredient_name', 'ingredient_picture', 'updated_at']).where({ ingredient_id }).update({ ...data, updated_at })
     } catch (error) {
         logger.error(error);
         response = { msg: 'unable to update ingredient', error };
