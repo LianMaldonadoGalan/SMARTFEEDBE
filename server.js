@@ -13,4 +13,11 @@ app.use("/ingredients", routerIngredients)
 app.use("/meals", routerMeals)
 app.use("/recipes", routerRecipes)
 
+// health check
+app.get('/health', (req, res) => {
+    res.send({
+        health: 'OK'
+    })
+})
+
 export default app;
