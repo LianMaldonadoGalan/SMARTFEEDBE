@@ -1,4 +1,4 @@
-import { getRecipe, insertRecipe, updateRecipe, deleteRecipe } from '../services/service.recipe'
+import { getRecipe, getRecipeUsingMealId, insertRecipe, updateRecipe, deleteRecipe } from '../services/service.recipe'
 
 import Pino from 'pino'
 
@@ -7,6 +7,18 @@ const logger = Pino()
 export async function getRecipeController(req, res){
     const { recipe_id } = req.params;
     const recipe = await getRecipe({ recipe_id });
+
+    if(recipe.error){
+        logger.error(recipe.error)
+        return res.status(500).json({ error: recipe.error })
+    }
+
+    return res.status(200).json(recipe)
+}
+
+export async function getRecipeUsingMealIdController(req, res){
+    const { id_meal } = req.params;
+    const recipe = await getRecipeUsingMealId({ id_meal });
 
     if(recipe.error){
         logger.error(recipe.error)

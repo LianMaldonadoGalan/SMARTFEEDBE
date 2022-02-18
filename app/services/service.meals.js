@@ -61,6 +61,23 @@ export async function updateMeal(data) {
 }
 
 export async function deleteMeal(data) {
+    // check if id_meal has recipe associated
+    const recipe = await pg.select().from('recipes').where( data );
+    
+    let recipeDel
+
+    if (recipe.length > 0) {
+        try{
+            recipeDel = await pg('recipes').returning(['meal_recipe', 'meal_ingredients', 'meal_prep_time']).where({ recipe_id: recipe[0].recipe_id }).del();
+        }catch(error){
+            logger.error(error);
+            recipeDel = { msg: 'unable to delete recipe', error: error };
+        }
+        if (recipeDel.error) {
+            return recipeDel;
+        }
+    }
+    
     let response
     try {
         response = await pg("meals").returning(['id_meal', 'meal_name'])
@@ -70,5 +87,10 @@ export async function deleteMeal(data) {
         logger.error(error);
         response = { msg: 'unable to delete meal', error: error };
     }
+
+    // if(recipeDel.length && !response.error){
+    //     response = { ...response[0], ...recipeDel[0] };
+    // }
+
     return response;
 }
