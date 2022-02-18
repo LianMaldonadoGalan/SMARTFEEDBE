@@ -17,6 +17,18 @@ export async function getRecipe(data) {
     return response;
 }
 
+export async function getRecipeUsingMealId(data) {
+    let response
+    try {
+        response = await pg.select().from('recipes').where(data);
+    }
+    catch (error) {
+        logger.error(error);
+        response = { msg: 'unable to get recipe', error };
+    }
+    return response;
+}
+
 export async function insertRecipe(data) {
     let response
     try {
