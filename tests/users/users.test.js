@@ -22,12 +22,15 @@ describe('User right', () => {
         const res = await request.post('/users').send(testUser2);
         
         expect(res.status).toBe(200);
-        expect(res.body[0]).toHaveProperty('id_user');
-        expect(res.body[0]).toHaveProperty('email');
-        expect(res.body[0]).toHaveProperty('created_at');
-        expect(res.body[0]).toHaveProperty('is_administrator');
-        expect(res.body[0]).not.toHaveProperty('passwd');
-        idToDelete = res.body[0].id_user;
+        expect(res.body.msg).toBe('user created');
+        expect(res.body.data).toHaveProperty('id_user');
+        expect(res.body.data).toHaveProperty('id_user_pref');
+        expect(res.body.data).toHaveProperty('email');
+        expect(res.body.data).toHaveProperty('created_at');
+        expect(res.body.data).toHaveProperty('is_administrator');
+        expect(res.body.data).not.toHaveProperty('passwd');
+        expect(res.body.data.email).toBe(testUser2.email);
+        idToDelete = res.body.data.id_user;
     })
 
     it('should return user', async () => {
