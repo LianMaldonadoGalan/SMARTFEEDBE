@@ -21,6 +21,9 @@ export async function getUserPref(data) {
 }
 
 export async function updateUserPref(data, queryParams) {
+    const updated_at = new Date().toISOString();
+    data = { ...data, updated_at };
+
     let response;
     try {
         response = await pg("user_pref").returning(["id_user_pref", "id_user", "menu_json", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "created_at", "updated_at"])

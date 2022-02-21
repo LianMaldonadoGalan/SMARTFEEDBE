@@ -25,6 +25,7 @@ describe('User right', () => {
         expect(res.body.msg).toBe('user created');
         expect(res.body.data).toHaveProperty('id_user');
         expect(res.body.data).toHaveProperty('id_user_pref');
+        expect(res.body.data).toHaveProperty('id_user_data');
         expect(res.body.data).toHaveProperty('email');
         expect(res.body.data).toHaveProperty('created_at');
         expect(res.body.data).toHaveProperty('is_administrator');

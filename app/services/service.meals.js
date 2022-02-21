@@ -46,6 +46,9 @@ export async function insertMeal(data) {
 }
 
 export async function updateMeal(data) {
+    const updated_at = new Date().toISOString();
+    data = { ...data, updated_at };
+
     const { id_meal } = data;
     delete data.id_meal
     let response
