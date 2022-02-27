@@ -1,8 +1,11 @@
-import { getUser, insertUser, updateUser, deleteUser } from '../services/service.users';
+import { getUser, insertUser, updateUser, deleteUser, getUserByEmail } from '../services/service.users';
 
 import Pino from 'pino'
+import jwt from 'jsonwebtoken';
 
 const logger = Pino()
+// eslint-disable-next-line no-undef
+const { JWTSECRET } = process.env
 
 export async function searchUsers(req, res) {
     const { email, passwd } = req.body;
@@ -11,15 +14,25 @@ export async function searchUsers(req, res) {
         logger.error('email or passwd is not defined');
         return res.status(400).json({ error: 'email or password are required' });
     }
-
-    const response = await getUser({ email, passwd });
+    const user = {
+        email: email.toLowerCase(),
+        passwd
+    }
+    const response = await getUser(user);
 
     if(response.error) {
         logger.error(response.error);
         return res.status(500).json({ error: response.error });
     }
 
-    return res.status(200).json(response);
+    if(Object.prototype.hasOwnProperty.call(response, 'data')){
+        // create a token
+        const token = jwt.sign({ id: response.data.id_user, email: response.data.email, admin: response.data.isAdmin }, JWTSECRET);
+        response.token = token;
+        return res.status(200).json(response);
+    }
+
+    return res.status(200).json({msgToken: "Unable to get jwt token", response});
 }
 
 export async function insertUserController(req, res) {
@@ -29,14 +42,39 @@ export async function insertUserController(req, res) {
         return res.status(400).json({ error: 'email or password are required' });
     }
     
-    const userInserted = isAdmin ? await insertUser({ email, passwd, isAdmin }) : await insertUser({ email, passwd });
+    const oldUser = await getUserByEmail({ email });
 
+    if(oldUser.error) {
+        logger.error(oldUser.error);
+        return res.status(500).json({ error: oldUser.error });
+    }
+
+    if(Object.prototype.hasOwnProperty.call(oldUser, 'data')) {
+        logger.error('user already exists');
+        return res.status(409).json({ error: 'user already exists' });
+    }
+
+    const user = {
+        email: email.toLowerCase(),
+        passwd,
+    }
+
+    const userInserted = isAdmin ? await insertUser({ ...user, isAdmin }) : await insertUser(user);
+
+    
     if(userInserted.error) {
         logger.error(userInserted.error);
         return res.status(500).json({ error: userInserted.error });
     }
     
-    return res.status(200).json(userInserted);
+    if(Object.prototype.hasOwnProperty.call(userInserted, 'data')) {
+        // create JWT token
+        const token = jwt.sign({ id: userInserted.data.id_user, email: userInserted.data.email }, JWTSECRET, { expiresIn: '1d' });
+        userInserted.token = token;
+        return res.status(200).json(userInserted);
+    }
+
+    return res.status(200).json({msgToken: "Unable to get jwt token" , userInserted});
 }
 
 export async function updateUserController(req, res) {
@@ -71,4 +109,21 @@ export async function deleteUserController(req, res) {
     }
 
     return res.status(200).json(userDeleted);
+}
+
+export async function getUserByEmailController(req, res) {
+    const { email } = req.body;
+    if(!email) {
+        logger.error('email is not defined');
+        return res.status(400).json({ error: 'email is required' });
+    }
+
+    const user = await getUserByEmail({ email });
+
+    if(user.error){
+        logger.error(user.error);
+        return res.status(500).json({ error: user.error });
+    }
+
+    return res.status(200).json(user);
 }

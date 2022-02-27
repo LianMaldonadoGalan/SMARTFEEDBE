@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import { verifyToken } from './app/middlewares/auth';
 import {routerUsers} from './app/routes/routes.user';
 import {routerIngredients} from './app/routes/routes.ingredients';
 import {routerMeals} from './app/routes/routes.meals';
@@ -25,11 +26,11 @@ const corsOptions = {
 app.use(cors(corsOptions))
 app.use(express.json());
 app.use("/users", routerUsers);
-app.use("/ingredients", routerIngredients)
-app.use("/meals", routerMeals)
-app.use("/recipes", routerRecipes)
-app.use("/userPref", routerPref)
-app.use("/userData", routerUserData)
+app.use("/ingredients", verifyToken, routerIngredients)
+app.use("/meals", verifyToken,routerMeals)
+app.use("/recipes", verifyToken, routerRecipes)
+app.use("/userPref", verifyToken, routerPref)
+app.use("/userData", verifyToken, routerUserData)
 
 // health check
 app.get('/health', (req, res) => {

@@ -13,6 +13,7 @@ const testUser2 = {
 }
 
 let idUser = null;
+let token = null;
 
 afterAll(() => {
     pg.destroy();
@@ -20,15 +21,18 @@ afterAll(() => {
 
 describe('User data right', () => {
     it('Should create a new user',async () => {
-        const res = await request.post('/users').send(testUser2);
+        const res = await request.post('/users/register').send(testUser2);
 
         expect(res.status).toBe(200);
         expect(res.body.msg).toBe('user created');
+        expect(res.body.data).toHaveProperty('id_user');
+        expect(res.body).toHaveProperty('token')
+        token = res.body.token;
         idUser = res.body.data.id_user;
     })
 
     it('Should return user data', async () => {
-        const res = await request.get(`/userData/${idUser}`);
+        const res = await request.get(`/userData/${idUser}`).auth(token, {type: 'bearer'});
 
         expect(res.status).toBe(200);
         expect(res.body.data).toHaveProperty('id_user');
@@ -47,7 +51,7 @@ describe('User data right', () => {
     })
 
     it('Should update a user data',async () => {
-        const res = await request.patch(`/userData/${idUser}`).send({
+        const res = await request.patch(`/userData/${idUser}`).auth(token, {type: 'bearer'}).send({
             profilePicture: 'https://www.seekpng.com/png/detail/966-9665317_placeholder-image-person-jpg.png',
             name: 'test',
             birthDate: '2020-01-01',

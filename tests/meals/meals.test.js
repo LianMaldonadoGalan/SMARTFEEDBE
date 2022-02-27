@@ -19,70 +19,89 @@ const mealTest = {
     fats: 1
 }
 
+const testUser2 = {
+    email: "test@meals.com",
+    passwd: "123325MEALS"
+}
+
+let token = null;
+let idToDeleteUser = null;
+let mealIdTest = 0;
+
 afterAll(() => {
     pg.destroy();
 });
 
-let mealIdTest = 0;
 
 describe('Meals right', () => {
+    it('Should create a new user',async () => {
+        const res = await request.post('/users/register').send(testUser2);
+
+        expect(res.status).toBe(200);
+        expect(res.body.msg).toBe('user created');
+        expect(res.body.data).toHaveProperty('id_user');
+        expect(res.body).toHaveProperty('token')
+        token = res.body.token;
+        idToDeleteUser = res.body.data.id_user;
+    })
+
     it('Should create a new meal', async () => {
-        const res = await request.post('/meals').send(mealTest);
+        const res = await request.post('/meals').auth(token, {type: 'bearer'}).send(mealTest);
         
         expect(res.status).toBe(200);
-        expect(res.body[0]).toHaveProperty('id_meal');
-        expect(res.body[0]).toHaveProperty('meal_photo');
-        expect(res.body[0]).toHaveProperty('meal_name');
-        expect(res.body[0]).toHaveProperty('meal_description');
-        expect(res.body[0]).toHaveProperty('meal_type');
-        expect(res.body[0]).toHaveProperty('meal_cost');
-        expect(res.body[0]).toHaveProperty('meal_protein');
-        expect(res.body[0]).toHaveProperty('meal_calories');
-        expect(res.body[0]).toHaveProperty('meal_carbohydrates');
-        expect(res.body[0]).toHaveProperty('meal_fats');
-        expect(res.body[0]).toHaveProperty('created_at');
-        mealIdTest = res.body[0].id_meal;
+        expect(res.body.data).toHaveProperty('id_meal');
+        expect(res.body.data).toHaveProperty('meal_photo');
+        expect(res.body.data).toHaveProperty('meal_name');
+        expect(res.body.data).toHaveProperty('meal_description');
+        expect(res.body.data).toHaveProperty('meal_type');
+        expect(res.body.data).toHaveProperty('meal_cost');
+        expect(res.body.data).toHaveProperty('meal_protein');
+        expect(res.body.data).toHaveProperty('meal_calories');
+        expect(res.body.data).toHaveProperty('meal_carbohydrates');
+        expect(res.body.data).toHaveProperty('meal_fats');
+        expect(res.body.data).toHaveProperty('created_at');
+        mealIdTest = res.body.data.id_meal;
     })
 
     it('Should get all meals', async () => {
-        const res = await request.get('/meals');
+        const res = await request.get('/meals').auth(token, {type: 'bearer'});
 
         expect(res.status).toBe(200);
-        expect(res.body.length).toBeGreaterThan(0);
-        expect(res.body[0]).toHaveProperty('id_meal');
-        expect(res.body[0]).toHaveProperty('meal_photo');
-        expect(res.body[0]).toHaveProperty('meal_name');
-        expect(res.body[0]).toHaveProperty('meal_description');
-        expect(res.body[0]).toHaveProperty('meal_type');
-        expect(res.body[0]).toHaveProperty('meal_cost');
-        expect(res.body[0]).toHaveProperty('meal_protein');
-        expect(res.body[0]).toHaveProperty('meal_calories');
-        expect(res.body[0]).toHaveProperty('meal_carbohydrates');
-        expect(res.body[0]).toHaveProperty('meal_fats');
-        expect(res.body[0]).toHaveProperty('created_at');
-        expect(res.body[0]).toHaveProperty('updated_at');
+        expect(res.body.data.length).toBeGreaterThan(0);
+        expect(res.body.data[0]).toHaveProperty('id_meal');
+        expect(res.body.data[0]).toHaveProperty('meal_photo');
+        expect(res.body.data[0]).toHaveProperty('meal_name');
+        expect(res.body.data[0]).toHaveProperty('meal_description');
+        expect(res.body.data[0]).toHaveProperty('meal_type');
+        expect(res.body.data[0]).toHaveProperty('meal_cost');
+        expect(res.body.data[0]).toHaveProperty('meal_protein');
+        expect(res.body.data[0]).toHaveProperty('meal_calories');
+        expect(res.body.data[0]).toHaveProperty('meal_carbohydrates');
+        expect(res.body.data[0]).toHaveProperty('meal_fats');
+        expect(res.body.data[0]).toHaveProperty('created_at');
+        expect(res.body.data[0]).toHaveProperty('updated_at');
     })
 
     it('should return meals', async () => {
-        const res = await request.get(`/meals/${mealIdTest}`);
+        const res = await request.get(`/meals/${mealIdTest}`).auth(token, {type: 'bearer'});
     
         expect(res.status).toBe(200);
-        expect(res.body[0]).toHaveProperty('id_meal');
-        expect(res.body[0]).toHaveProperty('meal_photo');
-        expect(res.body[0]).toHaveProperty('meal_name');
-        expect(res.body[0]).toHaveProperty('meal_description');
-        expect(res.body[0]).toHaveProperty('meal_type');
-        expect(res.body[0]).toHaveProperty('meal_cost');
-        expect(res.body[0]).toHaveProperty('meal_protein');
-        expect(res.body[0]).toHaveProperty('meal_calories');
-        expect(res.body[0]).toHaveProperty('meal_carbohydrates');
-        expect(res.body[0]).toHaveProperty('meal_fats');
-        expect(res.body[0]).toHaveProperty('created_at');
-        expect(res.body[0]).toHaveProperty('updated_at');
+        expect(res.body.data).toHaveProperty('id_meal');
+        expect(res.body.data).toHaveProperty('meal_photo');
+        expect(res.body.data).toHaveProperty('meal_name');
+        expect(res.body.data).toHaveProperty('meal_description');
+        expect(res.body.data).toHaveProperty('meal_type');
+        expect(res.body.data).toHaveProperty('meal_cost');
+        expect(res.body.data).toHaveProperty('meal_protein');
+        expect(res.body.data).toHaveProperty('meal_calories');
+        expect(res.body.data).toHaveProperty('meal_carbohydrates');
+        expect(res.body.data).toHaveProperty('meal_fats');
+        expect(res.body.data).toHaveProperty('created_at');
+        expect(res.body.data).toHaveProperty('updated_at');
     })
     
     it('should update a meal', async () => {
-        const res = await request.patch(`/meals/${mealIdTest}`).send({
+        const res = await request.patch(`/meals/${mealIdTest}`).auth(token, {type: 'bearer'}).send({
             photo: 'https://saborgourmet.com//wp-content/uploads/meal-prep-hamburguesas-brocoli-istock.jpg',
             name: 'Hamburguesa con zanahoria',
             description: 'Deliciosa Hamburguesa con zanahorias de acompañamiento',
@@ -90,28 +109,34 @@ describe('Meals right', () => {
             cost: 2,
             calories: 190,
             carbohydrates: 2,
-            ats: 1
+            fats: 1
         });
     
         expect(res.status).toBe(200);
-        expect(res.body[0]).toHaveProperty('id_meal');
-        expect(res.body[0]).toHaveProperty('meal_photo');
-        expect(res.body[0]).toHaveProperty('meal_name');
-        expect(res.body[0]).toHaveProperty('meal_description');
-        expect(res.body[0]).toHaveProperty('meal_type');
-        expect(res.body[0]).toHaveProperty('meal_cost');
-        expect(res.body[0]).toHaveProperty('meal_protein');
-        expect(res.body[0]).toHaveProperty('meal_calories');
-        expect(res.body[0]).toHaveProperty('meal_carbohydrates');
-        expect(res.body[0]).toHaveProperty('meal_fats');
-        expect(res.body[0]).toHaveProperty('updated_at');
+        expect(res.body.data).toHaveProperty('id_meal');
+        expect(res.body.data).toHaveProperty('meal_photo');
+        expect(res.body.data).toHaveProperty('meal_name');
+        expect(res.body.data).toHaveProperty('meal_description');
+        expect(res.body.data).toHaveProperty('meal_type');
+        expect(res.body.data).toHaveProperty('meal_cost');
+        expect(res.body.data).toHaveProperty('meal_protein');
+        expect(res.body.data).toHaveProperty('meal_calories');
+        expect(res.body.data).toHaveProperty('meal_carbohydrates');
+        expect(res.body.data).toHaveProperty('meal_fats');
+        expect(res.body.data).toHaveProperty('updated_at');
     });
 
     it('should delete a meal', async () => {
-        const res = await request.delete(`/meals/${mealIdTest}`);
+        const res = await request.delete(`/meals/${mealIdTest}`).auth(token, {type: 'bearer'});
     
         expect(res.status).toBe(200);
-        expect(res.body[0]).toHaveProperty('id_meal');
-        expect(res.body[0]).toHaveProperty('meal_name');
+        expect(res.body.data).toHaveProperty('id_meal');
+        expect(res.body.data).toHaveProperty('meal_name');
+    })
+
+    it('Should delete a user ingredients',async () => {
+        const res = await request.delete('/users').send({ id_user: idToDeleteUser });
+
+        expect(res.status).toBe(200);
     })
 })
