@@ -8,7 +8,14 @@ const pg = knexfile
 export async function getUser(data) {
     let response
     try {
-        response = await pg.select('id_user', 'email', 'is_administrator').from('users').where({email: data.email, passwd: data.passwd});
+        response = await pg.select('id_user', 'email', 'is_administrator').from('users').where(data);
+        
+        if(response.length > 0) {
+            response = { msg: 'user found', data: response[0] };
+        }
+        else{
+            response = { msg: 'user not found' };
+        }
     } catch (error) {
         logger.error(error);
         response = { msg: 'unable to get user', error };
@@ -33,6 +40,9 @@ export async function insertUser(data) {
             const data = { ...response[0], ...userPref[0], ...userData[0] }
             response = { msg: 'user created', data }
         }
+        else{
+            response = { msg: 'user not created' };
+        }
     } catch (error) {
         logger.error(error)
         response = { msg: 'unable to insert user', error }
@@ -45,7 +55,14 @@ export async function updateUser(data) {
     const updated_at = new Date().toISOString();
     let response
     try {
-        response = isAdmin ? await pg("users").returning(['id_user', 'email', 'is_administrator']).where({ id_user }).update({ email, passwd, isAdmin, updated_at }) : await pg("users").returning(['id_user', 'email', 'is_administrator']).where({ id_user }).update({ email, passwd, updated_at })
+        response = isAdmin ? await pg("users").returning('id_user', 'email', 'is_administrator').where({ id_user }).update({ email, passwd, isAdmin, updated_at }) : await pg("users").returning(['id_user', 'email', 'is_administrator']).where({ id_user }).update({ email, passwd, updated_at })
+
+        if(response.length >= 0) {
+            response = { msg: 'user updated', data: response[0] };
+        }
+        else{
+            response = { msg: 'user not updated' };
+        }
     } catch (error) {
         logger.error(error);
         response = { msg: 'unable to update user', error }
@@ -64,6 +81,13 @@ export async function deleteUser(data) {
         await pg("user_pref").where({ id_user_pref: userPref[0].id_user_pref }).del();
         await pg("user_data").where({ id_user_data: userData[0].id_user_data }).del();
         response = await pg("users").returning(['id_user', 'email']).where({ id_user }).del()
+
+        if (response.length >= 0) {
+            response = { msg: 'user deleted', data: response[0] };
+        }
+        else{
+            response = { msg: 'user not deleted' };
+        }
     }
     catch (error) {
         logger.error(error);
@@ -74,4 +98,23 @@ export async function deleteUser(data) {
 
 function getNameFromEmail(email) {
     return email.split('@')[0]
+}
+
+
+export async function getUserByEmail(data) {
+    let response
+    try {
+        response = await pg.select('email').from('users').where(data);
+        if(response.length > 0){
+            response = { msg: 'user found', data: response[0] };
+        }
+        else{
+            response = { msg: 'user not found' };
+        }
+    }
+    catch (error) {
+        logger.error(error);
+        response = { msg: 'unable to get user', error };
+    }
+    return response;
 }

@@ -1,13 +1,15 @@
 import express from 'express';
 
-import { searchUsers, insertUserController, updateUserController, deleteUserController } from '../controllers/controller.users';
+import { searchUsers, insertUserController, updateUserController, deleteUserController, getUserByEmailController } from '../controllers/controller.users';
 
 export const routerUsers = express.Router();
 
-routerUsers.get('/', searchUsers);
+routerUsers.post('/login', searchUsers);
 
-routerUsers.post('/', insertUserController);
+routerUsers.post('/register', insertUserController);
 
 routerUsers.patch('/', updateUserController);
 
 routerUsers.delete('/', deleteUserController);
+
+routerUsers.get('/', getUserByEmailController);

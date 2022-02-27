@@ -11,7 +11,7 @@ const testUser2 = {
     passwd: "123325"
 }
 let idToDeleteUser = null;
-// let idToDeletePref = null;
+let token = null;
 
 // destroy connection after all tests
 afterAll(() => {
@@ -20,16 +20,18 @@ afterAll(() => {
 
 describe('Users pref right',() => {
     it('Should create a new user',async () => {
-        const res = await request.post('/users').send(testUser2);
+        const res = await request.post('/users/register').send(testUser2);
 
         expect(res.status).toBe(200);
         expect(res.body.msg).toBe('user created');
+        expect(res.body.data).toHaveProperty('id_user');
+        expect(res.body).toHaveProperty('token')
+        token = res.body.token;
         idToDeleteUser = res.body.data.id_user;
-        // idToDeletePref = res.body.data.id_user_pref;
     })
 
     it('Should get user preferences', async () => {
-        const res = await request.get(`/userPref/${idToDeleteUser}`);
+        const res = await request.get(`/userPref/${idToDeleteUser}`).auth(token, {type: 'bearer'});
 
         expect(res.status).toBe(200);
         expect(res.body.data).toHaveProperty('id_user_pref');
@@ -39,7 +41,7 @@ describe('Users pref right',() => {
     })
 
     it('Should update user preferences', async () => {
-        const res = await request.patch(`/userPref/${idToDeleteUser}`).send({
+        const res = await request.patch(`/userPref/${idToDeleteUser}`).auth(token, {type: 'bearer'}).send({
             menuJSON: '{"menu":{"monday":[1,3,5],"tuesday":[2,1,5],"wednesday":[1,5,1],"thursday":[2,5,6],"friday":[1,2,7],"saturday":[23,61,61],"sunday":[1,6,12]}}',
             monday: '1,3,5',
             tuesday: '2,1,5'

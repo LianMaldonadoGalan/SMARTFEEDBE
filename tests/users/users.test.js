@@ -19,8 +19,8 @@ afterAll(() => {
 
 describe('User right', () => {
     it('Should create a new user',async () => {
-        const res = await request.post('/users').send(testUser2);
-        
+        const res = await request.post('/users/register').send(testUser2);
+
         expect(res.status).toBe(200);
         expect(res.body.msg).toBe('user created');
         expect(res.body.data).toHaveProperty('id_user');
@@ -35,13 +35,14 @@ describe('User right', () => {
     })
 
     it('should return user', async () => {
-        const res = await request.get('/users').send(testUser2);
+        const res = await request.post('/users/login').send(testUser2);
 
         expect(res.status).toBe(200);
-        expect(res.body[0]).toHaveProperty('email');
-        expect(res.body[0]).not.toHaveProperty('passwd');
-        expect(res.body[0]).toHaveProperty('id_user');
-        expect(res.body[0]).toHaveProperty('is_administrator');
+        expect(res.body.msg).toBe('user found');
+        expect(res.body.data).toHaveProperty('email');
+        expect(res.body.data).not.toHaveProperty('passwd');
+        expect(res.body.data).toHaveProperty('id_user');
+        expect(res.body.data).toHaveProperty('is_administrator');
     })
     
     it('Should update a user',async () => {
@@ -52,16 +53,18 @@ describe('User right', () => {
         })
 
         expect(res.status).toBe(200);
-        expect(res.body[0]).toHaveProperty('id_user');
-        expect(res.body[0]).toHaveProperty('email');
-        expect(res.body[0]).toHaveProperty('is_administrator');    
+        expect(res.body.msg).toBe('user updated');
+        expect(res.body.data).toHaveProperty('id_user');
+        expect(res.body.data).toHaveProperty('email');
+        expect(res.body.data).toHaveProperty('is_administrator');    
     })
 
     it('Should delete a user',async () => {
         const res = await request.delete('/users').send({ id_user: idToDelete });
 
         expect(res.status).toBe(200);
-        expect(res.body[0]).toHaveProperty('id_user');
-        expect(res.body[0]).toHaveProperty('email');
+        expect(res.body.msg).toBe('user deleted');
+        expect(res.body.data).toHaveProperty('id_user');
+        expect(res.body.data).toHaveProperty('email');
     })
 })

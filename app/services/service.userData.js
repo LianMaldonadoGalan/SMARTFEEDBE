@@ -13,6 +13,9 @@ export async function getUserData(data) {
         if(response.length >= 0) {
             response = { msg: 'user data found', data: response[0] };
         }
+        else{
+            response = { msg: 'user data not found' };
+        }
     }
     catch (error) {
         logger.error(error);
@@ -43,3 +46,14 @@ export async function updateUserData(data, queryParams) {
     }
     return response;
 }
+
+// TODO: add ability to check if user is able to generate menu
+// export async function canGenerateMenu(data) {
+//     const userData = await getUserData(data);
+
+//     if(userData.data.id_user_data === null) {
+//         return { msg: "user data not found", data: null };
+//     }
+
+//     const {  } = userData.data;
+// }

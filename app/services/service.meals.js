@@ -9,6 +9,12 @@ export async function getAllMeals() {
     let response
     try {
         response = await pg.select().from('meals');
+        if(response.length > 0) {
+            response = { msg: 'meals found', data: response };
+        }
+        else{
+            response = { msg: 'meals not found' };
+        }
     } catch (error) {
         logger.error(error);
         response = {
@@ -25,6 +31,13 @@ export async function getMeal(data){
         response = await pg.select()
                             .from('meals')
                             .where(data);
+
+        if(response.length > 0) {
+            response = { msg: 'meal found', data: response[0] };
+        }
+        else{
+            response = { msg: 'meal not found' };
+        }
     }catch(error){
         logger.error(error);
         response = { msg: 'unable to get meal', error: error };
@@ -38,6 +51,13 @@ export async function insertMeal(data) {
         response = await pg.returning(['id_meal', 'meal_photo', 'meal_name', 'meal_description', 'meal_type', 'meal_cost', 'meal_protein', 'meal_calories', 'meal_carbohydrates', 'meal_fats', 'created_at', 'updated_at'])
                             .insert(data)
                             .into('meals');
+
+        if(response.length > 0) {
+            response = { msg: 'meal inserted', data: response[0] };
+        }
+        else{
+            response = { msg: 'meal not inserted' };
+        }
     } catch (error) {
         logger.error(error);
         response = { msg: 'unable to insert meal', error: error };
@@ -56,6 +76,13 @@ export async function updateMeal(data) {
         response = await pg("meals").returning(['id_meal', 'meal_photo', 'meal_name', 'meal_description', 'meal_type', 'meal_cost', 'meal_protein', 'meal_calories', 'meal_carbohydrates', 'meal_fats', 'updated_at'])
                             .where({ id_meal })
                             .update(data);
+
+        if(response.length > 0) {
+            response = { msg: 'meal updated', data: response[0] };
+        }
+        else{
+            response = { msg: 'meal not updated' };
+        }
     } catch(error){
         logger.error(error);
         response = { msg: 'unable to update meal', error: error };
@@ -86,6 +113,13 @@ export async function deleteMeal(data) {
         response = await pg("meals").returning(['id_meal', 'meal_name'])
                             .where(data)
                             .del();
+        
+        if(response.length > 0) {
+            response = { msg: 'meal deleted', data: response[0] };
+        }
+        else{
+            response = { msg: 'meal not deleted' };
+        }
     } catch(error){
         logger.error(error);
         response = { msg: 'unable to delete meal', error: error };
