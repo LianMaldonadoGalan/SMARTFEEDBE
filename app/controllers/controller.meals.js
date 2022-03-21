@@ -11,7 +11,8 @@ import Pino from 'pino'
 const logger = Pino()
 
 export async function getAllMealsController(req, res) {
-    const allMeals = await getAllMeals()
+    const { page, limit } = req.query
+    const allMeals = await getAllMeals(limit, page)
     
     if (allMeals.error) {
         logger.error(allMeals.error)

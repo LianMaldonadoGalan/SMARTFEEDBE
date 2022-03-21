@@ -64,7 +64,7 @@ describe('Meals right', () => {
     })
 
     it('Should get all meals', async () => {
-        const res = await request.get('/meals').auth(token, {type: 'bearer'});
+        const res = await request.get('/meals?limit=10&page=0').auth(token, {type: 'bearer'});
 
         expect(res.status).toBe(200);
         expect(res.body.data.length).toBeGreaterThan(0);
