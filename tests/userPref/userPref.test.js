@@ -55,7 +55,7 @@ describe('Users pref right',() => {
     })
 
     it('Should delete user', async () => {
-        const res = await request.delete(`/users/`).send({ id_user: idToDeleteUser });
+        const res = await request.delete(`/users/`).auth(token, {type: 'bearer'}).send({ id_user: idToDeleteUser });
 
         expect(res.status).toBe(200);
     })

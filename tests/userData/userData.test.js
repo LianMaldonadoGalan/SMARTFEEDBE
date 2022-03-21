@@ -71,7 +71,7 @@ describe('User data right', () => {
     })
 
     it('Should delete user', async () => {
-        const res = await request.delete(`/users/`).send({ id_user: idUser });
+        const res = await request.delete(`/users/`).auth(token, {type: 'bearer'}).send({ id_user: idUser });
 
         expect(res.status).toBe(200);
     })

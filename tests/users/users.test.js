@@ -11,6 +11,7 @@ const testUser2 = {
     passwd: "123325"
 }
 let idToDelete = null;
+let token = null;
 
 // destroy connection after all tests
 afterAll(() => {
@@ -39,14 +40,16 @@ describe('User right', () => {
 
         expect(res.status).toBe(200);
         expect(res.body.msg).toBe('user found');
+        expect(res.body).toHaveProperty('token');
         expect(res.body.data).toHaveProperty('email');
         expect(res.body.data).not.toHaveProperty('passwd');
         expect(res.body.data).toHaveProperty('id_user');
         expect(res.body.data).toHaveProperty('is_administrator');
+        token = res.body.token;
     })
     
     it('Should update a user',async () => {
-        const res = await request.patch('/users').send({
+        const res = await request.patch('/users').auth(token, {type: 'bearer'}).send({
             id_user: idToDelete,
             email: testUser2.email,
             passwd: testUser2.passwd
@@ -60,7 +63,7 @@ describe('User right', () => {
     })
 
     it('Should delete a user',async () => {
-        const res = await request.delete('/users').send({ id_user: idToDelete });
+        const res = await request.delete('/users').auth(token, {type: 'bearer'}).send({ id_user: idToDelete });
 
         expect(res.status).toBe(200);
         expect(res.body.msg).toBe('user deleted');
