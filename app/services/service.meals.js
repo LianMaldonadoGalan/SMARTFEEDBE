@@ -5,10 +5,10 @@ const logger = Pino();
 
 const pg = knexfile;
 
-export async function getAllMeals() {
+export async function getAllMeals(limit = 10, page = 1) {
     let response
     try {
-        response = await pg.select().from('meals');
+        response = await pg.select().from('meals').limit(limit).offset(page).orderBy('id_meal', 'desc');
         if(response.length > 0) {
             response = { msg: 'meals found', data: response };
         }
