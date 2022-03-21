@@ -135,7 +135,7 @@ describe('Meals right', () => {
     })
 
     it('Should delete a user ingredients',async () => {
-        const res = await request.delete('/users').send({ id_user: idToDeleteUser });
+        const res = await request.delete('/users').auth(token, {type: 'bearer'}).send({ id_user: idToDeleteUser });
 
         expect(res.status).toBe(200);
     })
