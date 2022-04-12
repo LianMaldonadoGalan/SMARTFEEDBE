@@ -9,7 +9,7 @@
         "sourceType": "module"
     },
     "rules": {
-        "no-console": "warn",
+        "no-console": "error",
         "no-await-in-loop": "warn",
         "no-constant-condition": "warn",
         "no-control-regex": "warn",

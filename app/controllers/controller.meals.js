@@ -97,7 +97,7 @@ export async function updateMealController(req, res) {
     const {
         name: meal_name,
         picture: meal_photo,
-        desc: meal_description,
+        description: meal_description,
         type: meal_type,
         cost: meal_cost,
         protein: meal_protein,
