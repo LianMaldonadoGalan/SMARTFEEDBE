@@ -48,7 +48,7 @@ export async function getMeal(data){
 export async function insertMeal(data) {
     let response
     try {
-        response = await pg.returning(['id_meal', 'meal_photo', 'meal_name', 'meal_description', 'meal_type', 'meal_cost', 'meal_protein', 'meal_calories', 'meal_carbohydrates', 'meal_fats', 'created_at', 'updated_at'])
+        response = await pg.returning(['id_meal', 'meal_photo', 'meal_name', 'meal_description', 'meal_main_type', 'meal_type', 'meal_cost', 'meal_protein', 'meal_calories', 'meal_carbohydrates', 'meal_fats', 'created_at', 'updated_at'])
                             .insert(data)
                             .into('meals');
 
@@ -73,7 +73,7 @@ export async function updateMeal(data) {
     delete data.id_meal
     let response
     try {
-        response = await pg("meals").returning(['id_meal', 'meal_photo', 'meal_name', 'meal_description', 'meal_type', 'meal_cost', 'meal_protein', 'meal_calories', 'meal_carbohydrates', 'meal_fats', 'updated_at'])
+        response = await pg("meals").returning(['id_meal', 'meal_photo', 'meal_name', 'meal_description', 'meal_main_type', 'meal_type', 'meal_cost', 'meal_protein', 'meal_calories', 'meal_carbohydrates', 'meal_fats', 'updated_at'])
                             .where({ id_meal })
                             .update(data);
 

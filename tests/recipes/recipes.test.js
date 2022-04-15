@@ -16,13 +16,14 @@ const testMeal = {
     protein: 56,
     calories: 220,
     carbohydrates: 2,
-    fats: 1
+    fats: 1,
+    mainType: '{breakfast: false, lunch: false, dinner: false, snack: true}'
 }
 
 const testRecipe = {
     mealIngredients: JSON.stringify([1, 3, 6, 8]),
     mealRecipe: "Esta receta esta con amor",
-    mealPrepTime: "1:30"
+    mealPrepTime: 90
 }
 
 const testUser2 = {
@@ -89,7 +90,8 @@ describe('Recipes right', () => {
     it('should update a recipe', async () => {
         const res = await request.patch(`/recipes/${idRecipe}`).auth(token, {type: 'bearer'}).send({
             mealIngredients: JSON.stringify([1, 3, 6, 8, 9]),
-            mealRecipe: "Esta receta esta con mucho mucho amor"
+            mealRecipe: "Esta receta esta con mucho mucho amor",
+            mealPrepTime: 80
         });
 
         expect(res.status).toBe(200);

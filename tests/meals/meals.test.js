@@ -16,7 +16,8 @@ const mealTest = {
     protein: 2,
     calories: 200,
     carbohydrates: 2,
-    fats: 1
+    fats: 1,
+    mainType: '{breakfast: false, lunch: false, dinner: false, snack: true}'
 }
 
 const testUser2 = {
@@ -53,6 +54,7 @@ describe('Meals right', () => {
         expect(res.body.data).toHaveProperty('meal_photo');
         expect(res.body.data).toHaveProperty('meal_name');
         expect(res.body.data).toHaveProperty('meal_description');
+        expect(res.body.data).toHaveProperty('meal_main_type');
         expect(res.body.data).toHaveProperty('meal_type');
         expect(res.body.data).toHaveProperty('meal_cost');
         expect(res.body.data).toHaveProperty('meal_protein');
@@ -72,6 +74,7 @@ describe('Meals right', () => {
         expect(res.body.data[0]).toHaveProperty('meal_photo');
         expect(res.body.data[0]).toHaveProperty('meal_name');
         expect(res.body.data[0]).toHaveProperty('meal_description');
+        expect(res.body.data[0]).toHaveProperty('meal_main_type');
         expect(res.body.data[0]).toHaveProperty('meal_type');
         expect(res.body.data[0]).toHaveProperty('meal_cost');
         expect(res.body.data[0]).toHaveProperty('meal_protein');
@@ -90,6 +93,7 @@ describe('Meals right', () => {
         expect(res.body.data).toHaveProperty('meal_photo');
         expect(res.body.data).toHaveProperty('meal_name');
         expect(res.body.data).toHaveProperty('meal_description');
+        expect(res.body.data).toHaveProperty('meal_main_type');
         expect(res.body.data).toHaveProperty('meal_type');
         expect(res.body.data).toHaveProperty('meal_cost');
         expect(res.body.data).toHaveProperty('meal_protein');
@@ -109,7 +113,8 @@ describe('Meals right', () => {
             cost: 2,
             calories: 190,
             carbohydrates: 2,
-            fats: 1
+            fats: 1,
+            mainType: '{breakfast: false, lunch: false, dinner: true, snack: false}'
         });
     
         expect(res.status).toBe(200);
@@ -117,6 +122,7 @@ describe('Meals right', () => {
         expect(res.body.data).toHaveProperty('meal_photo');
         expect(res.body.data).toHaveProperty('meal_name');
         expect(res.body.data).toHaveProperty('meal_description');
+        expect(res.body.data).toHaveProperty('meal_main_type');
         expect(res.body.data).toHaveProperty('meal_type');
         expect(res.body.data).toHaveProperty('meal_cost');
         expect(res.body.data).toHaveProperty('meal_protein');
