@@ -56,6 +56,7 @@ export async function insertMealController(req, res) {
         name: meal_name,
         photo: meal_photo,
         description: meal_description,
+        mainType: meal_main_type,
         type: meal_type,
         cost: meal_cost,
         protein: meal_protein,
@@ -64,7 +65,7 @@ export async function insertMealController(req, res) {
         fats: meal_fats
     } = req.body;
 
-    if (!meal_name || !meal_photo || !meal_description || !meal_type || !meal_cost || !meal_protein || !meal_calories || !meal_carbohydrates || !meal_fats) {
+    if (!meal_name || !meal_photo || !meal_description || !meal_type || !meal_cost || !meal_protein || !meal_calories || !meal_carbohydrates || !meal_fats || !meal_main_type) {
         logger.error('missing some field');
         return res.status(400).json({
             error: 'some fields required are missing'
@@ -75,6 +76,7 @@ export async function insertMealController(req, res) {
         meal_name,
         meal_photo,
         meal_description,
+        meal_main_type,
         meal_type,
         meal_cost,
         meal_protein,
