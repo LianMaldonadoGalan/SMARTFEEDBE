@@ -17,7 +17,6 @@ const testMeal = {
     calories: 220,
     carbohydrates: 2,
     fats: 1,
-    mainType: '{breakfast: false, lunch: false, dinner: false, snack: true}'
 }
 
 const testRecipe = {

@@ -17,7 +17,6 @@ const mealTest = {
     calories: 200,
     carbohydrates: 2,
     fats: 1,
-    mainType: '{breakfast: false, lunch: false, dinner: false, snack: true}'
 }
 
 const testUser2 = {
@@ -114,7 +113,6 @@ describe('Meals right', () => {
             calories: 190,
             carbohydrates: 2,
             fats: 1,
-            mainType: '{breakfast: false, lunch: false, dinner: true, snack: false}'
         });
     
         expect(res.status).toBe(200);

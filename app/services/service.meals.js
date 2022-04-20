@@ -1,5 +1,6 @@
 import knexfile from "../knexfile";
 import Pino from "pino";
+import axios from "axios";
 
 const logger = Pino();
 
@@ -48,6 +49,11 @@ export async function getMeal(data){
 export async function insertMeal(data) {
     let response
     try {
+        // call data mining api to get meal main type
+        const mainTypeFromModel = await getMainMealTypeFromModel(data);
+        if(mainTypeFromModel !== '')
+            data['meal_main_type'] = mainTypeFromModel;
+        
         response = await pg.returning(['id_meal', 'meal_photo', 'meal_name', 'meal_description', 'meal_main_type', 'meal_type', 'meal_cost', 'meal_protein', 'meal_calories', 'meal_carbohydrates', 'meal_fats', 'created_at', 'updated_at'])
                             .insert(data)
                             .into('meals');
@@ -130,4 +136,21 @@ export async function deleteMeal(data) {
     // }
 
     return response;
+}
+
+async function getMainMealTypeFromModel(data){
+    const { meal_protein, meal_calories, meal_carbohydrates, meal_fats } = data;
+    
+    // send data to model as json
+    const mainMealTypeModel = await axios.post('https://smart-feed-data-mining.herokuapp.com/predict', {
+        "proteins": meal_protein,
+        "calories": meal_calories,
+        "carbos": meal_carbohydrates,
+        "fats": meal_fats
+        })
+    
+    if(!Object.prototype.hasOwnProperty.call(mainMealTypeModel, 'data')){
+        return ''
+    }
+    return mainMealTypeModel.data.prediction;   
 }
