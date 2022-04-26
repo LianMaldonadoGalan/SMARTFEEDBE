@@ -40,7 +40,7 @@ afterAll(() => {
 });
 
 describe('Recipes right', () => {
-    it('Should create a new user recipe',async () => {
+    it('Should create a new user',async () => {
         const res = await request.post('/users/register').send(testUser2);
 
         expect(res.status).toBe(200);

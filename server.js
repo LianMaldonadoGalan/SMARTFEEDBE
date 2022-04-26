@@ -7,6 +7,7 @@ import {routerMeals} from './app/routes/routes.meals';
 import {routerRecipes} from './app/routes/routes.recipe';
 import {routerPref} from './app/routes/routes.userPref';
 import {routerUserData} from './app/routes/routes.userData';
+import {routerMenu} from './app/routes/routes.createMenu';
 
 // App
 const app = express();
@@ -31,6 +32,7 @@ app.use("/meals", verifyToken,routerMeals)
 app.use("/recipes", verifyToken, routerRecipes)
 app.use("/userPref", verifyToken, routerPref)
 app.use("/userData", verifyToken, routerUserData)
+app.use("/menu", verifyToken, routerMenu)
 
 // health check
 app.get('/health', (req, res) => {
