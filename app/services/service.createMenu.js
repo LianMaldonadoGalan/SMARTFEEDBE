@@ -103,7 +103,7 @@ async function createMenu(userInfo) {
 
     const finalCaloriesValue = finalCalories(userInfo)
 
-    let totalCalories = 0
+    let totalCalories = finalCaloriesValue
     // 1 = lower weight, 2 = maintain weight, 3 = higher weight
     if (goal === '1') {
         totalCalories = finalCaloriesValue - 300
