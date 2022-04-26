@@ -131,7 +131,6 @@ async function createMenu(userInfo) {
     Object.keys(eachWeekDay).forEach(day => {
         types.forEach(meal => {
             const mealsFiltered = allMeals.filter(m => m.meal_main_type.toUpperCase() === meal.toUpperCase()).map(i => i.id_meal)
-            // get random number in range
             if(mealsFiltered.length > 0) {
                 const randomMeals = pickRandomMeals(mealsFiltered)
                 eachWeekDay[day][meal] = [...randomMeals]
