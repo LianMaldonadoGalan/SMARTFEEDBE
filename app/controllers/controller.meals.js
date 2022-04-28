@@ -12,7 +12,17 @@ const logger = Pino()
 
 export async function getAllMealsController(req, res) {
     const { page, limit } = req.query
-    const allMeals = await getAllMeals(limit, page)
+    let { mealIds } = req.query
+    if(mealIds){
+        try {
+            mealIds = JSON.parse(mealIds)
+        } catch (error) {
+            logger.error(error)
+            mealIds = []
+        }
+    }
+    
+    const allMeals = await getAllMeals(limit, page, mealIds)
     
     if (allMeals.error) {
         logger.error(allMeals.error)

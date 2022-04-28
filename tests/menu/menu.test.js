@@ -31,9 +31,26 @@ describe('Menu right', () => {
         idToDeleteUser = res.body.data.id_user;
     })
 
-    it('Should create and return menu', async () => {
-        const res = await request.post(`/menu/${idToDeleteUser}`).auth(token, {type: 'bearer'});
+    it('Should update user data',async () => {
+        const res = await request.patch(`/userData/${idToDeleteUser}`).auth(token, {type: 'bearer'}).send({
+            profilePicture: 'https://www.seekpng.com/png/detail/966-9665317_placeholder-image-person-jpg.png',
+            name: 'test',
+            birthDate: '2000-01-01',
+            bmi: 20,
+            height: 180,
+            weight: 80,
+            physicalActivity: '2',
+            isVegetarian: 'F',
+            sex: 'M',
+            goal: '1',
+            mealsQty: '3'
+        })
 
+        expect(res.status).toBe(200);
+    })
+
+    it('Should create and return menu', async () => {
+        const res = await request.get(`/menu/${idToDeleteUser}`).auth(token, {type: 'bearer'});
         expect(res.status).toBe(200);
         expect(res.body.data).toHaveProperty('id_user_pref');
         expect(res.body.data).toHaveProperty('id_user');
