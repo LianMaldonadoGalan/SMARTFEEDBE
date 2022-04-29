@@ -170,19 +170,21 @@ function calculateAgeByBirthDate(birthDate) {
 
 function pickRandomMeals(meals) {
     // get three random meals from meals array and return id_meal
-    const randomMealsPicked = []
+    // const randomMealsPicked = []
     const randomMealsId = []
-    if(meals.length < 3)
-        return meals
-
-    for(let i = 0; i < 3; i++) {
-        const randomNumber = Math.floor(Math.random() * meals.length)
-        if(randomMealsPicked.includes(randomNumber)) {
-            i--
-            continue
-        }
-        randomMealsPicked.push(randomNumber)
-        randomMealsId.push(meals[randomNumber])
-    }
+    
+    // if(meals.length < 3)
+    //     return meals
+    const randomNumber = Math.floor(Math.random() * meals.length)
+    randomMealsId.push(meals[randomNumber])
+    // for(let i = 0; i < 3; i++) {
+    //     const randomNumber = Math.floor(Math.random() * meals.length)
+    //     if(randomMealsPicked.includes(randomNumber)) {
+    //         i--
+    //         continue
+    //     }
+    //     randomMealsPicked.push(randomNumber)
+    //     randomMealsId.push(meals[randomNumber])
+    // }
     return randomMealsId
 }
