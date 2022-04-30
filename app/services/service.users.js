@@ -24,7 +24,7 @@ export async function getUser(data) {
 } 
 
 export async function insertUser(data) {
-    const menuString = '{"menu":{"monday":[],"tuesday":[],"wednesday":[],"thursday":[],"friday":[],"saturday":[],"sunday":[]}}'
+    const menuString = '{"monday":{},"tuesday":{},"wednesday":{},"thursday":{},"friday":{},"saturday":{},"sunday":{}}'
     const { email, passwd, isAdmin } = data;
 
     const name = getNameFromEmail(email);

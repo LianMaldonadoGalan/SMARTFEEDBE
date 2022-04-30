@@ -44,6 +44,11 @@ export async function getRecipeUsingMealId(data) {
 export async function insertRecipe(data) {
     let response
     try {
+        const ingredientsFound = await checkIngredients(data.meal_ingredients);
+        if(!ingredientsFound) {
+           return response = { msg: 'ingredients not found' };
+        }
+
         response = await pg.returning(['recipe_id', 'id_meal', 'meal_ingredients', 'meal_recipe', 'meal_prep_time', 'created_at', 'updated_at']).insert(data).into('recipes');
         if(response.length > 0) {
             response = { msg: 'recipe inserted', data: response[0] };
@@ -57,6 +62,23 @@ export async function insertRecipe(data) {
     }
     return response;
 }
+
+async function checkIngredients(ingredientsArray) {
+    let ingredientsFound
+    const returningIngredient = ['ingredient_id', 'ingredient_name', 'ingredient_picture']
+    let arrayParsed = []
+
+    try {
+        arrayParsed = JSON.parse(ingredientsArray)
+    } catch (error) {
+        logger.error(error, 'Error parsing ingredients');
+        arrayParsed = []
+    }
+
+    ingredientsFound = await pg.select(returningIngredient).from('ingredients').whereIn('ingredient_id', arrayParsed);
+
+    return ingredientsFound.length === arrayParsed.length
+} 
 
 export async function updateRecipe(data, queryParams) {
     const { recipe_id } = queryParams;

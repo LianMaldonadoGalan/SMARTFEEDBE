@@ -40,6 +40,107 @@ export async function algoMenu(data) {
     return response
 }
 
+export async function getMenuCart(data) {
+    const menuJSON = await checkIfMenuExists(data)
+
+    if(menuJSON.noMenu) {
+        logger.error('menu does not exist')
+        return { error: 'menu does not exist' }
+    }
+    const listMeals = await getListOfAllMeals(menuJSON)
+    const listRecipes = await getListOfRecipes(listMeals)
+    const listIngredients = await getListOfIngredients(listRecipes)
+
+    if(listIngredients.error) return { msg: "unable to get ingredients cart", error: error };
+    
+    return {msg: "menu cart retrieved", data: listIngredients}
+}
+
+async function checkIfMenuExists(data) {
+    const menuExists = await pg.select('menu_json').from('user_pref').where({id_user: data})
+    if(menuExists.length > 0 && menuExists[0].menu_json) {
+        let menu
+        try {
+            menu = JSON.parse(menuExists[0].menu_json)
+        } catch (error) {
+            logger.error({error}, 'error parsing menu')
+            menu = {}
+        }
+        if(menu && menu.monday && menu.monday.desayuno) return menu
+    }
+    return {noMenu: true}
+}
+
+async function getListOfAllMeals(data) {
+    const listDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+    const listMealsPerDay = ['desayuno', 'almuerzo', 'comida','merienda', 'cena']
+    const listMeals = []
+
+    listDays.forEach(day => {
+        listMealsPerDay.forEach(meal => {
+            if(data[day] && data[day][meal]) {
+                data[day][meal].forEach(ingredient => {
+                    listMeals.push(ingredient)
+                })
+            }
+        })
+    })
+    return [...new Set(listMeals)]
+}
+
+async function getListOfRecipes(data) {
+    const recipes = await pg.select('meal_ingredients').from('recipes').whereIn('id_meal', data)
+    return recipes
+}
+
+async function getListOfIngredients(data) {
+    const listIngredients = []
+    data.forEach(recipe => {
+        let ingredientParsed
+        try {
+            ingredientParsed = JSON.parse(recipe.meal_ingredients)
+        } catch (error) {
+            logger.error({error}, 'error parsing recipe')
+            ingredientParsed = []
+        }
+        ingredientParsed.forEach(ingredient => {
+            listIngredients.push(ingredient)
+        })
+    })
+
+    const ingredientsCount = listIngredients.reduce((acc, curr) => {
+        if (acc[curr]) {
+            acc[curr]++
+        } else {
+            acc[curr] = 1
+        }
+        return acc
+    }, {})
+    
+    const ingredientsCleaned = [... new Set(listIngredients)]
+    const columnsToGet = ['ingredient_id', 'ingredient_name', 'ingredient_picture']
+    const ingredientsRetrived = await pg.select(columnsToGet).from('ingredients').whereIn('ingredient_id', ingredientsCleaned)
+
+    if(ingredientsRetrived.error) return {error: 'error getting ingredients'}
+
+    const ingredientsWithCount = ingredientsCleaned.map(ingredient => {
+        return {
+            ingredient,
+            count: ingredientsCount[ingredient]
+        }
+    })
+    // count ingredients retrived
+    const finalIngredients = ingredientsRetrived.map(ingredient => {
+        const ingredientWithCount = ingredientsWithCount.find(ingredientWithCount => ingredientWithCount.ingredient === ingredient.ingredient_id)
+        return {
+            ...ingredient,
+            count: ingredientWithCount.count
+        }
+    })
+
+    return finalIngredients
+}
+
 function tbm(weight, height, age, sex) {
     let tbm = 0
     if (sex === 'M')

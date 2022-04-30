@@ -19,10 +19,9 @@ const testMeal = {
     fats: 1,
 }
 
-const testRecipe = {
-    mealIngredients: JSON.stringify([1, 3, 6, 8]),
-    mealRecipe: "Esta receta esta con amor",
-    mealPrepTime: 90
+const testIngredient = {
+    name: 'Test Ingredient',
+    picture: 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png'
 }
 
 const testUser2 = {
@@ -34,6 +33,8 @@ let mealId = 0;
 let idRecipe = 0;
 let token = null;
 let idToDeleteUser = null;
+let idIngredient = 0;
+let idIngredient2 = 0;
 
 afterAll(() => {
     pg.destroy();
@@ -59,8 +60,22 @@ describe('Recipes right', () => {
         mealId = res.body.data.id_meal;
     })
 
+    it('Should insert ingredient for the recipe', async () => {
+        const res = await request.post('/ingredients').auth(token, {type: 'bearer'}).send(testIngredient);
+
+        expect(res.status).toBe(200);
+        idIngredient = res.body.data.ingredient_id;
+    })
+
     it('should insert recipes', async () => {
-        const res = await request.post('/recipes').auth(token, {type: 'bearer'}).send({...testRecipe, mealId});
+        const res = await request.post('/recipes').auth(token, {type: 'bearer'}).send(
+            {
+                mealId,
+                mealIngredients: JSON.stringify([idIngredient]),
+                mealRecipe: "Esta receta esta con amor",
+                mealPrepTime: 90
+            }
+        );
 
         expect(res.status).toBe(200);
         expect(res.body.data).toHaveProperty('recipe_id');
@@ -86,9 +101,16 @@ describe('Recipes right', () => {
         expect(res.body.data).toHaveProperty('updated_at');
     });
 
+    it('Should insert second ingredient for the recipe', async () => {
+        const res = await request.post('/ingredients').auth(token, {type: 'bearer'}).send(testIngredient);
+
+        expect(res.status).toBe(200);
+        idIngredient2 = res.body.data.ingredient_id;
+    })
+
     it('should update a recipe', async () => {
         const res = await request.patch(`/recipes/${idRecipe}`).auth(token, {type: 'bearer'}).send({
-            mealIngredients: JSON.stringify([1, 3, 6, 8, 9]),
+            mealIngredients: JSON.stringify([idIngredient2]),
             mealRecipe: "Esta receta esta con mucho mucho amor",
             mealPrepTime: 80
         });
