@@ -37,21 +37,6 @@ describe('Users pref right',() => {
         expect(res.body.data).toHaveProperty('id_user_pref');
         expect(res.body.data).toHaveProperty('id_user');
         expect(res.body.data).toHaveProperty('menu_json');
-        expect(res.body.data).toHaveProperty('monday');
-    })
-
-    it('Should update user preferences', async () => {
-        const res = await request.patch(`/userPref/${idToDeleteUser}`).auth(token, {type: 'bearer'}).send({
-            menuJSON: '{"menu":{"monday":[1,3,5],"tuesday":[2,1,5],"wednesday":[1,5,1],"thursday":[2,5,6],"friday":[1,2,7],"saturday":[23,61,61],"sunday":[1,6,12]}}',
-            monday: '1,3,5',
-            tuesday: '2,1,5'
-        });
-
-        expect(res.status).toBe(200);
-        expect(res.body.data).toHaveProperty('id_user_pref');
-        expect(res.body.data).toHaveProperty('id_user');
-        expect(res.body.data).toHaveProperty('menu_json');
-        expect(res.body.data).toHaveProperty('monday');
     })
 
     it('Should delete user', async () => {
