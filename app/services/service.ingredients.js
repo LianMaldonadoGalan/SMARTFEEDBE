@@ -80,6 +80,14 @@ export async function updateIngredient(data, queryParams) {
 export async function deleteIngredient(data) {
     let response
     try {
+        const isInRecipes = await pg.select('*')
+            .from('recipes')
+            .whereLike('meal_ingredients', `%,${data.ingredient_id},%`)
+            .orWhereRaw(`"meal_ingredients" like ?`, [`%,${data.ingredient_id}]%]`])
+            .orWhereRaw(`"meal_ingredients" like ?`, [`%[${data.ingredient_id},%]`])
+            
+        if(isInRecipes.length > 0) return response = { msg: 'unable to delete ingredient, belongs to recipe'};
+
         response = await pg("ingredients").returning(['ingredient_id', 'ingredient_name']).where( data ).del()
         if(response.length > 0) {
             response = { msg: 'ingredient deleted', data: response[0] };
