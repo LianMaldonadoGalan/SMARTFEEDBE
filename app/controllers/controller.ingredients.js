@@ -80,6 +80,11 @@ export async function deleteIngredientController(req, res) {
 
     const ingredient = await deleteIngredient({ ingredient_id });
 
+    if(ingredient.msg === 'unable to delete ingredient, belongs to recipe') {
+        logger.error(ingredient.msg);
+        return res.status(400).json({ msg: ingredient.msg, error: 'id_ingredient can not be deleted' });
+    }
+
     if (ingredient.error) {
         logger.error(ingredient.error);
         return res.status(500).json({ error: ingredient.error });
