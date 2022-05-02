@@ -5,6 +5,7 @@ import {
 
 import Pino from 'pino'
 import errorResponseJSON from '../errorHandler';
+import errorBuilderJSON from '../errorHandlerV2';
 import CustomError from '../ErrorResponse';
 
 const logger = Pino()
@@ -13,6 +14,8 @@ export async function getUserDataController(req, res) {
     const {
         id_user
     } = req.params;
+
+    let resJSON
 
     try {
         if (!id_user) {
@@ -23,11 +26,16 @@ export async function getUserDataController(req, res) {
             id_user
         });
 
-        return res.status(200).json(response);    
+        resJSON = {
+            status: 200,
+            message: response.message,
+            data: response.data
+        }
     } catch (error) {
         logger.error(error)
-        return errorResponseJSON(error, res)
+        resJSON = errorBuilderJSON(error)
     }
+    return res.status(resJSON.status).json(resJSON);
 }
 
 export async function updateUserDataController(req, res) {

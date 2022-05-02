@@ -3,25 +3,30 @@ import { getUserPref, updateUserPref } from '../services/service.userPref';
 import Pino from 'pino'
 import errorResponseJSON from '../errorHandler';
 import CustomError from '../ErrorResponse';
+import errorBuilderJSON from '../errorHandlerV2';
 
 const logger = Pino()
 
 export async function getUserPrefController(req, res) {
     const { id_user } = req.params;
-    let resObj
+    let resJSON
     try {
         if (!id_user) {
             throw new CustomError(400, 'Missing required fields', 'Bad request');
         }
         
         const userPref = await getUserPref({ id_user });
-    
-        resObj = res.status(200).json(userPref);
+        
+        resJSON = {
+            status: 200,
+            message: userPref.message,
+            data: userPref.data
+        }
     } catch (error) {
         logger.error(error)
-        resObj = errorResponseJSON(error, res)
+        resJSON = errorBuilderJSON(error)
     }
-    return resObj
+    return res.status(resJSON.status).json(resJSON);
 }
 
 export async function updateUserPrefController(req, res) {
