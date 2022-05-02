@@ -20,7 +20,7 @@ export async function getRecipeUsingMealId(data) {
 
     if(response.error) throw new CustomError(500, "Internal error retrieving recipe", response.error);
 
-    return response.length > 0 ? { message: 'recipe found', data: response[0] } : { message: 'recipe not found' };
+    return response.length > 0 ? { message: 'recipe found', data: response } : { message: 'recipe not found' };
 }
 
 export async function insertRecipe(data) {
