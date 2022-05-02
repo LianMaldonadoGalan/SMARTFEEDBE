@@ -12,7 +12,7 @@ import {routerMenu} from './app/routes/routes.createMenu';
 // App
 const app = express();
 
-const whitelist = ['http://localhost:3000', 'http://localhost:3001', 'https://smart-feed-fe-admin.herokuapp.com/'];
+const whitelist = ['http://localhost:3000', 'http://localhost:3001', 'https://smart-feed-fe-admin.herokuapp.com'];
 const corsOptions = {
     origin: function (origin, callback) {
         if (!origin || whitelist.indexOf(origin) !== -1) {
