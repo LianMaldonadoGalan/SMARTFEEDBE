@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 import knexfile from "../knexfile";
 import Pino from 'pino'
+import CustomError from "../ErrorResponse";
 
 const logger = Pino()
 
@@ -15,8 +16,7 @@ export async function algoMenu(data) {
     // check if user data is complete
     const userDataComplete = infoNeeded.every(info => userInfo[0][info] !== null && userInfo[0][info] !== '')
     if(!userDataComplete) {
-        logger.error('user data is not complete');
-        return { error: 'user data is not complete' };
+        throw new CustomError(400, 'user data is not complete', 'Bad request');
     }
     const menu = await createMenu(userInfo[0])
     
@@ -44,20 +44,22 @@ export async function getMenuCart(data) {
     const menuJSON = await checkIfMenuExists(data)
 
     if(menuJSON.noMenu) {
-        logger.error('menu does not exist')
-        return { error: 'menu does not exist' }
+        throw new CustomError(400, 'menu does not exist', 'Bad request');
     }
     const listMeals = await getListOfAllMeals(menuJSON)
     const listRecipes = await getListOfRecipes(listMeals)
     const listIngredients = await getListOfIngredients(listRecipes)
 
-    if(listIngredients.error) return { msg: "unable to get ingredients cart", error: error };
+    if(listIngredients.error) throw new CustomError(400, 'error getting ingredients', 'Bad request');
     
     return {msg: "menu cart retrieved", data: listIngredients}
 }
 
 async function checkIfMenuExists(data) {
     const menuExists = await pg.select('menu_json').from('user_pref').where({id_user: data})
+
+    if(menuExists.error) throw new CustomError(500, 'error getting menu', 'Bad request');
+
     if(menuExists.length > 0 && menuExists[0].menu_json) {
         let menu
         try {
@@ -121,7 +123,7 @@ async function getListOfIngredients(data) {
     const columnsToGet = ['ingredient_id', 'ingredient_name', 'ingredient_picture']
     const ingredientsRetrived = await pg.select(columnsToGet).from('ingredients').whereIn('ingredient_id', ingredientsCleaned)
 
-    if(ingredientsRetrived.error) return {error: 'error getting ingredients'}
+    if(ingredientsRetrived.error) throw new CustomError(400, 'error getting ingredients', 'Bad request');
 
     const ingredientsWithCount = ingredientsCleaned.map(ingredient => {
         return {
@@ -222,8 +224,8 @@ async function createMenu(userInfo) {
     } else if (mealQty === 5) {
         types = ['desayuno', 'almuerzo', 'comida', 'merienda', 'cena']
     }
-    const minCalories = totalCalories * mealCaloriePercent - 200
-    const maxCalories = totalCalories * mealCaloriePercent + 200
+    const minCalories = totalCalories * mealCaloriePercent - 100
+    const maxCalories = totalCalories * mealCaloriePercent + 100
 
     const allMeals = await pg.select('*').from('meals').whereBetween('meal_calories', [minCalories, maxCalories]).where({
         meal_type: isVeggie

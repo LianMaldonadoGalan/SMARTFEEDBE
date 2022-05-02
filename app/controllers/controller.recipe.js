@@ -1,84 +1,81 @@
 import { getRecipe, getRecipeUsingMealId, insertRecipe, updateRecipe, deleteRecipe } from '../services/service.recipe'
 
 import Pino from 'pino'
+import errorResponseJSON from '../errorHandler';
+import CustomError from '../ErrorResponse';
 
 const logger = Pino()
 
 export async function getRecipeController(req, res){
     const { recipe_id } = req.params;
-    const recipe = await getRecipe({ recipe_id });
-
-    if(recipe.error){
-        logger.error(recipe.error)
-        return res.status(500).json({ error: recipe.error })
+    try {
+        const recipe = await getRecipe({ recipe_id });
+    
+        return res.status(200).json(recipe)
+    } catch (error) {
+        logger.error(error);
+        return errorResponseJSON(error, res);
     }
-
-    return res.status(200).json(recipe)
 }
 
 export async function getRecipeUsingMealIdController(req, res){
     const { id_meal } = req.params;
-    const recipe = await getRecipeUsingMealId({ id_meal });
+    try {
+        const recipe = await getRecipeUsingMealId({ id_meal });
 
-    if(recipe.error){
-        logger.error(recipe.error)
-        return res.status(500).json({ error: recipe.error })
+        return res.status(200).json(recipe)
+    } catch (error) {
+        logger.error(error);
+        return errorResponseJSON(error, res);
     }
-
-    return res.status(200).json(recipe)
 }
 
 export async function insertRecipeController(req, res) {
     const { mealId:id_meal, mealIngredients:meal_ingredients, mealRecipe:meal_recipe, mealPrepTime:meal_prep_time } = req.body;
     
-    if (!id_meal || !meal_ingredients || !meal_recipe || !meal_prep_time) {
-        logger.error('id_meal, meal_ingredients, meal_recipe or meal_prep_time is not defined');
-        return res.status(400).json({ error: 'id_meal, meal_ingredients, meal_recipe or meal_prep_time are required' });
+    try {
+        if (!id_meal || !meal_ingredients || !meal_recipe || !meal_prep_time) {
+            throw new CustomError(400, 'Missing required fields', 'Bad request');
+        }
+    
+        const recipe = await insertRecipe({ id_meal, meal_ingredients, meal_recipe, meal_prep_time });
+    
+        return res.status(200).json(recipe);
+    } catch (error) {
+        logger.error(error);
+        return errorResponseJSON(error, res);
     }
-
-    const recipe = await insertRecipe({ id_meal, meal_ingredients, meal_recipe, meal_prep_time });
-
-    if (recipe.error) {
-        logger.error(recipe.error);
-        return res.status(500).json({ error: recipe.error });
-    }
-
-    return res.status(200).json(recipe);
 }
 
 export async function updateRecipeController(req, res) {
     const { recipe_id } = req.params;
     const { mealIngredients:meal_ingredients, mealRecipe:meal_recipe, mealPrepTime:meal_prep_time } = req.body;
+    try {
+        if (!recipe_id) {
+            throw new CustomError(400, 'Missing recipe id', 'Bad request');
+        }
+    
+        const recipe = await updateRecipe({ meal_ingredients, meal_recipe, meal_prep_time }, { recipe_id });
 
-    if (!recipe_id) {
-        logger.error('recipe_id is not defined');
-        return res.status(400).json({ error: 'recipe_id is required' });
+        return res.status(200).json(recipe);
+    } catch (error) {
+        logger.error(error);
+        return errorResponseJSON(error, res);
     }
-
-    const recipe = await updateRecipe({ meal_ingredients, meal_recipe, meal_prep_time }, { recipe_id });
-
-    if (recipe.error) {
-        logger.error(recipe.error);
-        return res.status(500).json({ error: recipe.error });
-    }
-
-    return res.status(200).json(recipe);
 }
 
 export async function deleteRecipeController(req, res) {
     const { recipe_id } = req.params;
+    try {
+        if (!recipe_id) {
+            throw new CustomError(400, 'Missing recipe id', 'Bad request');
+        }
+    
+        const recipe = await deleteRecipe({ recipe_id });
 
-    if (!recipe_id) {
-        logger.error('id_meal is not defined');
-        return res.status(400).json({ error: 'id_meal is required' });
+        return res.status(200).json(recipe);       
+    } catch (error) {
+        logger.error(error);
+        return errorResponseJSON(error, res);
     }
-
-    const recipe = await deleteRecipe({ recipe_id });
-
-    if (recipe.error) {
-        logger.error(recipe.error);
-        return res.status(500).json({ error: recipe.error });
-    }
-
-    return res.status(200).json(recipe);
 }

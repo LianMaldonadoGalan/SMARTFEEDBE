@@ -1,66 +1,40 @@
 /* eslint-disable no-undef */
 import knexfile from "../knexfile";
 import Pino from 'pino'
+import CustomError from "../ErrorResponse";
 
 const logger = Pino()
 
 const pg = knexfile
 
 export async function getRecipe(data) {
-    let response
-    try {
-        response = await pg.select().from('recipes').where(data);
-        if(response.length > 0) {
-            response = { msg: 'recipe found', data: response[0] };
-        }
-        else{
-            response = { msg: 'recipe not found' };
-        }
-    } catch (error) {
-        logger.error(error);
-        response = { msg: 'unable to get recipe', error };
-    }
-    return response;
+    let response = await pg.select().from('recipes').where(data);
+
+    if(response.error) throw new CustomError(500, "Internal error retrieving recipe", response.error);
+
+    return response.length > 0 ? { message: 'recipe found', data: response[0] } : { message: 'recipe not found' };
 }
 
 export async function getRecipeUsingMealId(data) {
-    let response
-    try {
-        response = await pg.select().from('recipes').where(data);
-        if(response.length > 0) {
-            response = { msg: 'recipe found', data: response };
-        }
-        else{
-            response = { msg: 'recipe not found' };
-        }
-    }
-    catch (error) {
-        logger.error(error);
-        response = { msg: 'unable to get recipe', error };
-    }
-    return response;
+    let response = await pg.select().from('recipes').where(data);
+
+    if(response.error) throw new CustomError(500, "Internal error retrieving recipe", response.error);
+
+    return response.length > 0 ? { message: 'recipe found', data: response[0] } : { message: 'recipe not found' };
 }
 
 export async function insertRecipe(data) {
     let response
-    try {
-        const ingredientsFound = await checkIngredients(data.meal_ingredients);
-        if(!ingredientsFound) {
-           return response = { msg: 'ingredients not found' };
-        }
-
-        response = await pg.returning(['recipe_id', 'id_meal', 'meal_ingredients', 'meal_recipe', 'meal_prep_time', 'created_at', 'updated_at']).insert(data).into('recipes');
-        if(response.length > 0) {
-            response = { msg: 'recipe inserted', data: response[0] };
-        }
-        else{
-            response = { msg: 'recipe not inserted' };
-        }
-    } catch (error) {
-        logger.error(error);
-        response = { msg: 'unable to insert recipe', error };
+    const ingredientsFound = await checkIngredients(data.meal_ingredients);
+    if(!ingredientsFound) {
+        throw new CustomError(400, "Ingredients not found", "Bad request");
     }
-    return response;
+
+    response = await pg.returning(['recipe_id', 'id_meal', 'meal_ingredients', 'meal_recipe', 'meal_prep_time', 'created_at', 'updated_at']).insert(data).into('recipes');
+
+    if(response.error) throw new CustomError(500, "Internal error inserting recipe", response.error);
+
+    return response.length > 0 ? { message: 'recipe inserted', data: response[0] } : { message: 'recipe not inserted' };
 }
 
 async function checkIngredients(ingredientsArray) {
@@ -84,37 +58,17 @@ export async function updateRecipe(data, queryParams) {
     const { recipe_id } = queryParams;
     const updated_at = new Date().toISOString();
 
-    let response
-    try {
-        response = await pg("recipes").returning(['recipe_id', 'id_meal', 'meal_ingredients', 'meal_recipe', 'meal_prep_time', 'updated_at']).where({ recipe_id }).update({...data, updated_at })
-        if(response.length > 0) {
-            response = { msg: 'recipe updated', data: response[0] };
-        }
-        else{
-            response = { msg: 'recipe not updated' };
-        }
-    } catch (error) {
-        logger.error(error);
-        response = { msg: 'unable to update recipe', error };
-    }
-    
-    return response
+    let response = await pg("recipes").returning(['recipe_id', 'id_meal', 'meal_ingredients', 'meal_recipe', 'meal_prep_time', 'updated_at']).where({ recipe_id }).update({...data, updated_at })
+
+    if(response.error) throw new CustomError(500, "Internal error updating recipe", response.error);
+
+    return response.length > 0 ? { message: 'recipe updated', data: response[0] } : { message: 'recipe not updated' };
 }
 
-
 export async function deleteRecipe(data) {
-    let response
-    try {
-        response = await pg("recipes").returning(['recipe_id', 'id_meal', 'meal_ingredients', 'meal_recipe', 'meal_prep_time']).where( data ).del()
-        if(response.length > 0) {
-            response = { msg: 'recipe deleted', data: response[0] };
-        }
-        else{
-            response = { msg: 'recipe not deleted' };
-        }
-    } catch (error) {
-        logger.error(error);
-        response = { msg: 'unable to delete recipe', error };
-    }
-    return response
+    let response = await pg("recipes").returning(['recipe_id', 'id_meal', 'meal_ingredients', 'meal_recipe', 'meal_prep_time']).where( data ).del()
+
+    if(response.error) throw new CustomError(500, "Internal error deleting recipe", response.error);
+
+    return response.length > 0 ? { message: 'recipe deleted', data: response[0] } : { message: 'recipe not deleted' };
 }
