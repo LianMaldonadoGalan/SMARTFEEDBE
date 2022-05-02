@@ -14,7 +14,7 @@ export async function getUser(data) {
 } 
 
 export async function insertUser(data) {
-    const menuString = '{"monday":{"desayuno":[642],"almuerzo":[615],"comida":[603],"merienda":[],"cena":[646]},"tuesday":{"desayuno":[642],"almuerzo":[627],"comida":[706],"merienda":[],"cena":[661]},"wednesday":{"desayuno":[642],"almuerzo":[602],"comida":[654],"merienda":[],"cena":[646]},"thursday":{"desayuno":[642],"almuerzo":[606],"comida":[618],"merienda":[],"cena":[619]},"friday":{"desayuno":[642],"almuerzo":[602],"comida":[706],"merienda":[],"cena":[619]},"saturday":{"desayuno":[642],"almuerzo":[615],"comida":[654],"merienda":[],"cena":[649]},"sunday":{"desayuno":[642],"almuerzo":[655],"comida":[601],"merienda":[],"cena":[661]}}'
+    const menuString = '{"monday":{"desayuno":[642],"almuerzo":[606],"comida":[660],"merienda":[594],"cena":[661]},"tuesday":{"desayuno":[642],"almuerzo":[606],"comida":[618],"merienda":[594],"cena":[661]},"wednesday":{"desayuno":[642],"almuerzo":[602],"comida":[706],"merienda":[594],"cena":[646]},"thursday":{"desayuno":[642],"almuerzo":[606],"comida":[660],"merienda":[594],"cena":[661]},"friday":{"desayuno":[642],"almuerzo":[606],"comida":[660],"merienda":[594],"cena":[649]},"saturday":{"desayuno":[642],"almuerzo":[602],"comida":[654],"merienda":[594],"cena":[649]},"sunday":{"desayuno":[642],"almuerzo":[606],"comida":[706],"merienda":[594],"cena":[649]}}'
     const { email, passwd, isAdmin } = data;
 
     const name = getNameFromEmail(email);
