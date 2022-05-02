@@ -8,6 +8,7 @@ const logger = Pino()
 
 export async function getUserPrefController(req, res) {
     const { id_user } = req.params;
+    let resObj
     try {
         if (!id_user) {
             throw new CustomError(400, 'Missing required fields', 'Bad request');
@@ -15,11 +16,12 @@ export async function getUserPrefController(req, res) {
         
         const userPref = await getUserPref({ id_user });
     
-        return res.status(200).json(userPref);
+        resObj = res.status(200).json(userPref);
     } catch (error) {
         logger.error(error)
-        return errorResponseJSON(error, res)
+        resObj = errorResponseJSON(error, res)
     }
+    return resObj
 }
 
 export async function updateUserPrefController(req, res) {
