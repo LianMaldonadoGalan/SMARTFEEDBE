@@ -1,57 +1,46 @@
 import { getUserPref, updateUserPref } from '../services/service.userPref';
 
 import Pino from 'pino'
+import errorResponseJSON from '../errorHandler';
+import CustomError from '../ErrorResponse';
 
 const logger = Pino()
 
 export async function getUserPrefController(req, res) {
     const { id_user } = req.params;
-
-    if (!id_user) {
-        logger.error('id_user is not defined');
-        return res.status(400).json({
-            error: 'id_user is required'
-        });
-    }
+    try {
+        if (!id_user) {
+            throw new CustomError(400, 'Missing required fields', 'Bad request');
+        }
+        
+        const userPref = await getUserPref({ id_user });
     
-    const userPref = await getUserPref({ id_user });
-
-    if (userPref.error) {
-        logger.error(userPref.error);
-        return res.status(500).json({
-            error: userPref.error
-        });
+        return res.status(200).json(userPref);
+    } catch (error) {
+        logger.error(error)
+        return errorResponseJSON(error, res)
     }
-
-    return res.status(200).json(userPref);
 }
 
 export async function updateUserPrefController(req, res) {
     const { menuJSON: menu_json, monday, tuesday } = req.body;
     const { id_user } = req.params;
 
-    if (!id_user) {
-        logger.error('id_user is not defined');
-        return res.status(400).json({
-            error: 'id_user is required'
-        });
+    try {
+        if (!id_user) {
+            throw new CustomError(400, 'Missing required fields', 'Bad request');
+        }
+    
+        if (!menu_json) {
+            throw new CustomError(400, 'menu_json is not defined', 'Bad request');
+        }
+    
+        const userPref = await updateUserPref({menu_json, monday, tuesday}, { id_user });
+       
+        return res.status(200).json(userPref);
+    } catch (error) {
+        logger.error(error)
+        return errorResponseJSON(error, res)
     }
 
-    if (!menu_json || !monday || !tuesday) {
-        logger.error('menu_json is not defined');
-        return res.status(400).json({
-            error: 'menu_json is required'
-        });
-    }
-
-    const userPref = await updateUserPref({menu_json, monday, tuesday}, { id_user });
-
-    if (userPref.error) {
-        logger.error(userPref.error);
-        return res.status(500).json({
-            error: userPref.error
-        });
-    }
-   
-    return res.status(200).json(userPref);
 }

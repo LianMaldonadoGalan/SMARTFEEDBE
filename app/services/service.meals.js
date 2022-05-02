@@ -1,6 +1,7 @@
 import knexfile from "../knexfile";
 import Pino from "pino";
 import axios from "axios";
+import CustomError from "../ErrorResponse";
 
 const logger = Pino();
 
@@ -8,72 +9,43 @@ const pg = knexfile;
 
 export async function getAllMeals(limit = 10, page = 1, mealIds = []) {
     let response
-    try {
-        if(Array.isArray(mealIds) && mealIds.length > 0) {
-            response = await pg.select().from('meals').whereIn('id_meal', mealIds).orderBy('id_meal', 'asc');
-        }
-        else{
-            response = await pg.select().from('meals').limit(limit).offset(page).orderBy('id_meal', 'desc');
-        }
-        if(response.length > 0) {
-            response = { msg: 'meals found', data: response };
-        }
-        else{
-            response = { msg: 'meals not found' };
-        }
-    } catch (error) {
-        logger.error(error);
-        response = {
-            msg: 'unable to get all meals',
-            error: error
-        }
+
+    if(Array.isArray(mealIds) && mealIds.length > 0) {
+        response = await pg.select().from('meals').whereIn('id_meal', mealIds).orderBy('id_meal', 'asc');
     }
-    return response;
+    else{
+        response = await pg.select().from('meals').limit(limit).offset(page).orderBy('id_meal', 'desc');
+    }
+
+    if(response.error) throw new CustomError(500, "Internal error retrieving meals", response.error);
+
+    return response.length > 0 ? { message: 'meals found', data: response } : { message: 'meals not found' };
 }
 
 export async function getMeal(data){
-    let response;
-    try{
-        response = await pg.select()
-                            .from('meals')
-                            .where(data);
+    let response = await pg.select()
+                        .from('meals')
+                        .where(data);
 
-        if(response.length > 0) {
-            response = { msg: 'meal found', data: response[0] };
-        }
-        else{
-            response = { msg: 'meal not found' };
-        }
-    }catch(error){
-        logger.error(error);
-        response = { msg: 'unable to get meal', error: error };
-    }
-    return response;
+    if (response.error) throw new CustomError(500, "Internal error retrieving meal", response.error);
+
+    return response.length > 0 ? { message: 'meal found', data: response[0] } : { message: 'meal not found' };
 }
 
 export async function insertMeal(data) {
     let response
-    try {
-        // call data mining api to get meal main type
-        const mainTypeFromModel = await getMainMealTypeFromModel(data);
-        if(mainTypeFromModel !== '')
-            data['meal_main_type'] = mainTypeFromModel;
-        
-        response = await pg.returning(['id_meal', 'meal_photo', 'meal_name', 'meal_description', 'meal_main_type', 'meal_type', 'meal_cost', 'meal_protein', 'meal_calories', 'meal_carbohydrates', 'meal_fats', 'created_at', 'updated_at'])
-                            .insert(data)
-                            .into('meals');
+    // call data mining api to get meal main type
+    const mainTypeFromModel = await getMainMealTypeFromModel(data);
+    if(mainTypeFromModel !== '')
+        data['meal_main_type'] = mainTypeFromModel;
+    
+    response = await pg.returning(['id_meal', 'meal_photo', 'meal_name', 'meal_description', 'meal_main_type', 'meal_type', 'meal_cost', 'meal_protein', 'meal_calories', 'meal_carbohydrates', 'meal_fats', 'created_at', 'updated_at'])
+                        .insert(data)
+                        .into('meals');
 
-        if(response.length > 0) {
-            response = { msg: 'meal inserted', data: response[0] };
-        }
-        else{
-            response = { msg: 'meal not inserted' };
-        }
-    } catch (error) {
-        logger.error(error);
-        response = { msg: 'unable to insert meal', error: error };
-    }
-    return response;
+    if (response.error) throw new CustomError(500, "Internal error inserting meal", response.error);
+
+    return response.length > 0 ? { message: 'meal inserted', data: response[0] } : { message: 'meal not inserted' };
 }
 
 export async function updateMeal(data) {
@@ -83,22 +55,13 @@ export async function updateMeal(data) {
     const { id_meal } = data;
     delete data.id_meal
     let response
-    try {
-        response = await pg("meals").returning(['id_meal', 'meal_photo', 'meal_name', 'meal_description', 'meal_main_type', 'meal_type', 'meal_cost', 'meal_protein', 'meal_calories', 'meal_carbohydrates', 'meal_fats', 'updated_at'])
-                            .where({ id_meal })
-                            .update(data);
+    response = await pg("meals").returning(['id_meal', 'meal_photo', 'meal_name', 'meal_description', 'meal_main_type', 'meal_type', 'meal_cost', 'meal_protein', 'meal_calories', 'meal_carbohydrates', 'meal_fats', 'updated_at'])
+                        .where({ id_meal })
+                        .update(data);
 
-        if(response.length > 0) {
-            response = { msg: 'meal updated', data: response[0] };
-        }
-        else{
-            response = { msg: 'meal not updated' };
-        }
-    } catch(error){
-        logger.error(error);
-        response = { msg: 'unable to update meal', error: error };
-    }
-    return response;
+    if(response.error) throw new CustomError(500, "Internal error updating meal", response.error);
+
+    return response.length > 0 ? { message: 'meal updated', data: response[0] } : { message: 'meal not updated' };
 }
 
 export async function deleteMeal(data) {
@@ -108,39 +71,19 @@ export async function deleteMeal(data) {
     let recipeDel
 
     if (recipe.length > 0) {
-        try{
-            recipeDel = await pg('recipes').returning(['meal_recipe', 'meal_ingredients', 'meal_prep_time']).where({ recipe_id: recipe[0].recipe_id }).del();
-        }catch(error){
-            logger.error(error);
-            recipeDel = { msg: 'unable to delete recipe', error: error };
-        }
-        if (recipeDel.error) {
-            return recipeDel;
-        }
+        recipeDel = await pg('recipes').returning(['meal_recipe', 'meal_ingredients', 'meal_prep_time']).where({ recipe_id: recipe[0].recipe_id }).del();
+        
+        if (recipeDel.error) throw new CustomError(500, "Internal error deleting meal", recipeDel.error);
+        logger.info({recipeDel}, 'recipe deleted');
     }
     
-    let response
-    try {
-        response = await pg("meals").returning(['id_meal', 'meal_name'])
-                            .where(data)
-                            .del();
-        
-        if(response.length > 0) {
-            response = { msg: 'meal deleted', data: response[0] };
-        }
-        else{
-            response = { msg: 'meal not deleted' };
-        }
-    } catch(error){
-        logger.error(error);
-        response = { msg: 'unable to delete meal', error: error };
-    }
+    let response = await pg("meals").returning(['id_meal', 'meal_name'])
+                        .where(data)
+                        .del();
+    
+    if (response.error) throw new CustomError(500, "Internal error deleting meal", response.error);
 
-    // if(recipeDel.length && !response.error){
-    //     response = { ...response[0], ...recipeDel[0] };
-    // }
-
-    return response;
+    return response.length > 0 ? { message: 'meal deleted', data: response[0] } : { message: 'meal not deleted' };
 }
 
 async function getMainMealTypeFromModel(data){

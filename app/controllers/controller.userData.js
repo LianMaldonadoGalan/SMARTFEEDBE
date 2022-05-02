@@ -4,6 +4,8 @@ import {
 } from '../services/service.userData';
 
 import Pino from 'pino'
+import errorResponseJSON from '../errorHandler';
+import CustomError from '../ErrorResponse';
 
 const logger = Pino()
 
@@ -12,25 +14,20 @@ export async function getUserDataController(req, res) {
         id_user
     } = req.params;
 
-    if (!id_user) {
-        logger.error('id_user is not defined');
-        return res.status(400).json({
-            error: 'id_user is required'
+    try {
+        if (!id_user) {
+            throw new CustomError(400, 'Missing required fields', 'Bad request');
+        }
+    
+        const response = await getUserData({
+            id_user
         });
+
+        return res.status(200).json(response);    
+    } catch (error) {
+        logger.error(error)
+        return errorResponseJSON(error, res)
     }
-
-    const response = await getUserData({
-        id_user
-    });
-
-    if (response.error) {
-        logger.error(response.error);
-        return res.status(500).json({
-            error: response.error
-        });
-    }
-
-    return res.status(200).json(response);
 }
 
 export async function updateUserDataController(req, res) {
@@ -52,33 +49,29 @@ export async function updateUserDataController(req, res) {
         id_user
     } = req.params;
 
-    if (!id_user) {
-        logger.error('id_user is not defined');
-        return res.status(400).json({
-            error: 'id_user is required'
-        });
-    }
-
-    const response = await updateUserData({
-        profile_picture,
-        name,
-        birth_date,
-        sex,
-        bmi,
-        height,
-        weight,
-        physical_activity,
-        is_vegetarian,
-        goal,
-        meals_qty
-    }, {id_user});
+    try {
+        if (!id_user) {
+            logger.error('id_user is not defined');
+            throw new CustomError(400, 'Missing required fields', 'Bad request');
+        }
     
-    if(response.error){
-        logger.error(response.error);
-        return res.status(500).json({
-            error: response.error
-        });
+        const response = await updateUserData({
+            profile_picture,
+            name,
+            birth_date,
+            sex,
+            bmi,
+            height,
+            weight,
+            physical_activity,
+            is_vegetarian,
+            goal,
+            meals_qty
+        }, {id_user});
+        
+        return res.status(200).json(response);
+    } catch (error) {
+        logger.error(error)
+        return errorResponseJSON(error, res)
     }
-
-    return res.status(200).json(response);
 }

@@ -1,94 +1,91 @@
 import { getIngredient, insertIngredient, updateIngredient, deleteIngredient, getAllIngredients } from '../services/service.ingredients';
+import errorResponseJSON from '../errorHandler';
 
 import Pino from 'pino'
+import CustomError from '../ErrorResponse';
 
 const logger = Pino()
 
 export async function getAllIngredientsController(req, res){
-    const allIngredients = await getAllIngredients()
+    try {
+        const allIngredients = await getAllIngredients()
+        
+        if(allIngredients.error){
+            logger.error(allIngredients.error)
+            return res.status(500).json({ error: allIngredients.error })
+        }
     
-    if(allIngredients.error){
-        logger.error(allIngredients.error)
-        return res.status(500).json({ error: allIngredients.error })
+        return res.status(200).json(allIngredients)
+    } catch (error) {
+        logger.error(error)
+        return errorResponseJSON(error, res)   
     }
-
-    return res.status(200).json(allIngredients)
 }
 
 export async function getIngredientController(req, res) {
     const { ingredient_id } = req.params;
+    try {
+        if (!ingredient_id) {
+            logger.error('id_ingredient is not defined');
+            throw new CustomError(400, 'id_ingredient is not defined', 'id_ingredient is not defined');
+        }
+    
+        const ingredient = await getIngredient({ ingredient_id });
 
-    if (!ingredient_id) {
-        logger.error('id_ingredient is not defined');
-        return res.status(400).json({ error: 'id_ingredient is required' });
+        return res.status(200).json(ingredient);
+    } catch (error) {
+        logger.error(error)
+        return errorResponseJSON(error, res)   
     }
-
-    const ingredient = await getIngredient({ ingredient_id });
-
-    if (ingredient.error) {
-        logger.error(ingredient.error);
-        return res.status(500).json({ error: ingredient.error });
-    }
-
-    return res.status(200).json(ingredient);
 }
 
 export async function insertIngredientController(req, res) {
     const { name:ingredient_name, picture:ingredient_picture  } = req.body;
 
-    if (!ingredient_name || !ingredient_picture ) {
-        logger.error('name or picture is not defined');
-        return res.status(400).json({ error: 'name or picture are required' });
+    try {
+        if (!ingredient_name || !ingredient_picture ) {
+            logger.error('name or picture is not defined');
+            throw new CustomError(400, 'name or picture is not defined', 'name or picture is not defined');
+        }
+    
+        const ingredient = await insertIngredient({ ingredient_name, ingredient_picture  });
+    
+        return res.status(200).json(ingredient);
+    } catch (error) {
+        logger.error(error)
+        return errorResponseJSON(error, res)   
     }
-
-    const ingredient = await insertIngredient({ ingredient_name, ingredient_picture  });
-
-    if (ingredient.error) {
-        logger.error(ingredient.error);
-        return res.status(500).json({ error: ingredient.error });
-    }
-
-    return res.status(200).json(ingredient);
 }
 
 export async function updateIngredientController(req, res) {
     const { ingredient_id } = req.params;
     const { name:ingredient_name, picture:ingredient_picture } = req.body;
     
-    if (!ingredient_id ) {
-        logger.error('id_ingredient is not defined');
-        return res.status(400).json({ error: 'id_ingredient are required' });
+    try {
+        if (!ingredient_id ) throw new CustomError(400, 'id_ingredient is not defined', 'id_ingredient is not defined');
+        
+        if (!ingredient_name && !ingredient_picture ) throw new CustomError(400, 'name and picture are not defined', 'name and picture are not defined');
+        
+        const ingredient = await updateIngredient({ ingredient_name, ingredient_picture }, { ingredient_id });
+    
+        return res.status(200).json(ingredient);        
+    } catch (error) {
+        logger.error(error)
+        return errorResponseJSON(error, res)   
     }
-
-    const ingredient = await updateIngredient({ ingredient_name, ingredient_picture }, { ingredient_id });
-
-    if (ingredient.error) {
-        logger.error(ingredient.error);
-        return res.status(500).json({ error: ingredient.error });
-    }
-
-    return res.status(200).json(ingredient);
 }
 
 export async function deleteIngredientController(req, res) {
     const { ingredient_id } = req.params;
 
-    if (!ingredient_id) {
-        logger.error('id_ingredient is not defined');
-        return res.status(400).json({ error: 'id_ingredient is required' });
+    try {
+        if (!ingredient_id) throw new CustomError(400, 'id_ingredient is not defined', 'id_ingredient is not defined');
+    
+        const ingredient = await deleteIngredient({ ingredient_id });
+    
+        return res.status(200).json(ingredient);
+    } catch (error) {
+        logger.error(error)
+        return errorResponseJSON(error, res)   
     }
-
-    const ingredient = await deleteIngredient({ ingredient_id });
-
-    if(ingredient.msg === 'unable to delete ingredient, belongs to recipe') {
-        logger.error(ingredient.msg);
-        return res.status(400).json({ msg: ingredient.msg, error: 'id_ingredient can not be deleted' });
-    }
-
-    if (ingredient.error) {
-        logger.error(ingredient.error);
-        return res.status(500).json({ error: ingredient.error });
-    }
-
-    return res.status(200).json(ingredient);
 }

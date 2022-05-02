@@ -7,7 +7,7 @@ const pg = knexfile;
 const request = supertest(app);
 
 const testUser2 = {
-    email: "test@test1234.com",
+    email: "test@testUser.com",
     passwd: "123325"
 }
 let idToDelete = null;
@@ -23,7 +23,7 @@ describe('User right', () => {
         const res = await request.post('/users/register').send(testUser2);
 
         expect(res.status).toBe(200);
-        expect(res.body.msg).toBe('user created');
+        expect(res.body.message).toBe('user created');
         expect(res.body.data).toHaveProperty('id_user');
         expect(res.body.data).toHaveProperty('id_user_pref');
         expect(res.body.data).toHaveProperty('id_user_data');
@@ -31,7 +31,7 @@ describe('User right', () => {
         expect(res.body.data).toHaveProperty('created_at');
         expect(res.body.data).toHaveProperty('is_administrator');
         expect(res.body.data).not.toHaveProperty('passwd');
-        expect(res.body.data.email).toBe(testUser2.email);
+        expect(res.body.data.email).toBe(testUser2.email.toLowerCase());
         idToDelete = res.body.data.id_user;
     })
 
@@ -39,7 +39,7 @@ describe('User right', () => {
         const res = await request.post('/users/login').send(testUser2);
 
         expect(res.status).toBe(200);
-        expect(res.body.msg).toBe('user found');
+        expect(res.body.message).toBe('user found');
         expect(res.body).toHaveProperty('token');
         expect(res.body.data).toHaveProperty('email');
         expect(res.body.data).not.toHaveProperty('passwd');
@@ -56,7 +56,7 @@ describe('User right', () => {
         })
 
         expect(res.status).toBe(200);
-        expect(res.body.msg).toBe('user updated');
+        expect(res.body.message).toBe('user updated');
         expect(res.body.data).toHaveProperty('id_user');
         expect(res.body.data).toHaveProperty('email');
         expect(res.body.data).toHaveProperty('is_administrator');    
@@ -66,7 +66,7 @@ describe('User right', () => {
         const res = await request.delete('/users').auth(token, {type: 'bearer'}).send({ id_user: idToDelete });
 
         expect(res.status).toBe(200);
-        expect(res.body.msg).toBe('user deleted');
+        expect(res.body.message).toBe('user deleted');
         expect(res.body.data).toHaveProperty('id_user');
         expect(res.body.data).toHaveProperty('email');
     })

@@ -27,7 +27,7 @@ describe('Ingredients Right', () => {
     it('Should create a new user ingredients',async () => {
         const res = await request.post('/users/register').send(testUser2);
         expect(res.status).toBe(200);
-        expect(res.body.msg).toBe('user created');
+        expect(res.body.message).toBe('user created');
         expect(res.body.data).toHaveProperty('id_user');
         expect(res.body).toHaveProperty('token')
         token = res.body.token;
