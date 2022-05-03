@@ -187,7 +187,7 @@ async function createMenu(userInfo) {
     const {
         meals_qty: mealQty,
         goal,
-        is_vegeterian: isVegetarian
+        is_vegetarian: isVegetarian
     } = userInfo
     const isVeggie = isVegetarian === 'T' ? 'V' : 'C'
     let types
