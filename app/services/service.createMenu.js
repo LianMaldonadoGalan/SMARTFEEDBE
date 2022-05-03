@@ -8,7 +8,7 @@ const logger = Pino()
 const pg = knexfile
 
 export async function algoMenu(data) {
-    const infoNeeded = ['meals_qty', 'goal', 'is_vegeterian', 'weight', 'height', 'birth_date', 'physical_activity', 'sex']
+    const infoNeeded = ['meals_qty', 'goal', 'is_vegetarian', 'weight', 'height', 'birth_date', 'physical_activity', 'sex']
     const updated_at = new Date().toISOString()
     // get user data
     const userInfo = await pg.select('*').from('user_data').where({id_user: data});
